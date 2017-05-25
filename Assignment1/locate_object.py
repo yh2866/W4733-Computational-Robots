@@ -5,7 +5,7 @@ if __name__ == "__main__":
 	servo(90)
  	time.sleep(1)
 
- 	set_speed(100)
+ 	set_speed(60)
  	time.sleep(1)
 
 	while us_dist(15)>100:
