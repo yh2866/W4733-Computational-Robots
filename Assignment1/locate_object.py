@@ -8,9 +8,14 @@ if __name__ == "__main__":
  	set_speed(60)
  	time.sleep(1)
 
-	while us_dist(15)>100:
+ 	#right_rot()
+
+	while True:
 		print us_dist(15)
 		right_rot()
-	stop()
+
+		if us_dist(15) <= 100:
+			stop()
+			break
 
 
