@@ -1,0 +1,14 @@
+ 	servo(90)
+   	time.sleep(1)
+  
+ -	while us_dist(15)>100:
+ -		print us_dist(15)
+ -		right_rot()
+ -	stop()
+ + 	if us_dist(15) < 100:
+ + 		continue
+ + 	else:
+ +		while us_dist(15)>100:
+ +			print us_dist(15)
+ +			right_rot()
+ +		stop()
