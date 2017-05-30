@@ -9,31 +9,28 @@ if __name__ == "__main__":
     objectDetected = False
     angle = 0
     servo(0)
- 	time.sleep(1)
-
- 	#set_speed(50)
- 	time.sleep(1)
+    time.sleep(1)
 
     inc = 3
     for ang in range(0,180,inc):
         sampling = []
-                servo(i)
-                time.sleep(0.3)
-                print("angle ", i)
+        servo(ang)
+        time.sleep(0.3)
+        print("angle ", i)
+        
+        for j in range(SAMPLE):
+                time.sleep(0.05)
+                d = us_dist(15)
                 
-                for j in range(SAMPLE):
-                        time.sleep(0.05)
-                        d = us_dist(15)
-                        
-                        print(d)
-                        
-                        if d <= 100 and d > 0:
-                                sampling.append(d)
+                print(d)
+                
+                if d <= 100 and d > 0:
+                        sampling.append(d)
 
-                if len(sampling) >= REQUIRED:
-                        objectDetected = True
-                        angle = i
-                        break   
+        if len(sampling) >= REQUIRED:
+                objectDetected = True
+                angle = i
+                break   
         if objectDetected:             
             objectDetected, angle = scanOneEighty()
             break
@@ -44,23 +41,23 @@ if __name__ == "__main__":
         servo(0)
         for ang in range(0,180,inc):
             sampling = []
-                    servo(i)
-                    time.sleep(0.3)
-                    print("angle ", i)
+            servo(ang)
+            time.sleep(0.3)
+            print("angle ", i)
+            
+            for j in range(SAMPLE):
+                    time.sleep(0.05)
+                    d = us_dist(15)
                     
-                    for j in range(SAMPLE):
-                            time.sleep(0.05)
-                            d = us_dist(15)
-                            
-                            print(d)
-                            
-                            if d <= 100 and d > 0:
-                                    sampling.append(d)
+                    print(d)
+                    
+                    if d <= 100 and d > 0:
+                            sampling.append(d)
 
-                    if len(sampling) >= REQUIRED:
-                            objectDetected = True
-                            angle = i
-                            break   
+            if len(sampling) >= REQUIRED:
+                    objectDetected = True
+                    angle = i
+                    break   
             if objectDetected:             
                 objectDetected, angle = scanOneEighty()
                 break
@@ -77,7 +74,7 @@ def move(min_dist):
     print "Moving Forward"
     while us_dist(15) > min_dist:
         fwd()
-        time.sleep(.04)
+        time.sleep(0.04)
     stop()
     time.sleep(3)
     print "Found obstacle"
