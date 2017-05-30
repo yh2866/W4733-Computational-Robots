@@ -1,5 +1,7 @@
 from gopigo import *
 import time
+import numpy as np
+from scipy.optimize import fsolve
 
 SAMPLE = 10
 REQUIRED = 8
@@ -35,9 +37,24 @@ if __name__ == "__main__":
 
         if len(sampling) >= REQUIRED:
                 angles.append(i)
-                
-                
+
+    #########################
+    """
+    calculate theta as the final result
+    """
+    alpha = angles[-1] - angles[0]
+    d = us_dist(15)
+    m, e = fsolve(calculate_angle(), [alpha, d])
+    theta0 = np.arctan(m/d)
+    theta = (alpha - theta0*2)  
+    #########################
 
     print(angles[-1] - angles[0])
 
         
+def calculate_angle(alpha, d):
+    m = 0
+    e = 0
+    l = d*tan(alpha/2)
+
+    return [m+e-l, -np.sin(np.arctan(m/d)) - ((e**2+m**2-l**2)/(2*e*np.sqrt(m**2+d**2)))]
