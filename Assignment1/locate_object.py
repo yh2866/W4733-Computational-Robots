@@ -68,66 +68,75 @@ def turn_to(angle):
 
 if __name__ == "__main__":
     objectDetected = False
-    angle = 0
-    servo(0)
+    scanFinished = False
+    angle = 1
+    servo(1)
     DPR = 360.0/64
-
+    angles = []
     inc = 4
-    for ang in range(1,179,inc):
+    #scan the 180 degrees range in front
+    for ang in range(1,177,inc):
+        servo(ang)
         sampling = []
         time.sleep(0.05)
-        #print("angle ", i)
-        
-        for j in range(SAMPLE):
-                time.sleep(0.01)
-                d = us_dist(15)
-                
-                #print(d)
-                
-                if d <= 100 and d > 0:
-                        sampling.append(d)
 
+        for j in range(SAMPLE):
+                time.sleep(0.001)
+                d = us_dist(15)             
+                if d <= 50 and d > 0:
+                        sampling.append(d)
+        #if object detected
         if len(sampling) >= REQUIRED:
-                objectDetected = True
-                angle = i
-                break   
+            objectDetected = True
+            angles.append(ang)
         if objectDetected:
-            angle = ang
-            #objectDetected, angle = scanOneEighty()
+            angles.append(ang)
+            if d >50:
+                scanFinished = True
+        if scanFinished:
+            angle = (angles[-1]+angles[0])/2
             break
-        servo(ang)
-        #left_deg(inc)
-    # if no object detected within 180 degrees
+        if ang == 177 and scanFinished == False:  #keep finding the obstacle until right 
+            angle = ang+30
+            break
+        if objectDetected == True and ang<20:
+            angle = 0
+            break
+
+    # if no object detected within 180 degrees, turn 180 degrees and scan again
     if objectDetected == False:
         left_deg(180)
         servo(0)
         for ang in range(1,179,inc):
+            servo(ang)
             sampling = []
             time.sleep(0.05)
-            print("angle ", i)
-            
-            for j in range(SAMPLE):
-                    time.sleep(0.05)
-                    d = us_dist(15)
-                    
-                    print(d)
-                    
-                    if d <= 100 and d > 0:
-                            sampling.append(d)
 
+            for j in range(SAMPLE):
+                    time.sleep(0.001)
+                    d = us_dist(15)             
+                    if d <= 50 and d > 0:
+                            sampling.append(d)
+            #if object detected
             if len(sampling) >= REQUIRED:
-                    objectDetected = True
-                    angle = i
-                    break   
+                objectDetected = True
+                angles.append(ang)
             if objectDetected:
-                angle = ang
-                #objectDetected, angle = scanOneEighty()
+                angles.append(ang)
+                if d >50:
+                    scanFinished = True
+            if scanFinished:
+                angle = (angles[-1]+angles[0])/2
                 break
-            servo(ang)
-            
+            if ang == 177 and scanFinished == False:  #keep finding the obstacle until right 
+                angle = ang+30
+                break
+            if objectDetected == True and ang<20:
+                angle = 0
+                break          
 
     servo(90)
-    #set_speed(50)
+    print "The car is facing towards %s degrees"%angle
     turn_to(angle)
     move(STOP_DIST)                                
 
