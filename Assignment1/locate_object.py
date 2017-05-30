@@ -30,9 +30,8 @@ def scanOneEighty():
                         break
                 
         return objectDetected, angle
-                
 
-if __name__ == "__main__":
+def completeScan():
         objectDetected = False
         angle = 0
         servo(90)
@@ -51,14 +50,31 @@ if __name__ == "__main__":
                                 break
                         
                 objectDetected, angle = scanOneEighty()
-        
+
+        return angle
+
+def fixPosition(angle):
         servo(90)
         set_speed(50)
         
-        t = (angle - 90) / 20        
+        t = (angle - 90 - 22) / 50
+        print("time: ", t)
+
+##        angle = angle - 22
+##        if abs(angle)<30:
+##                t = (angle - 90) / 200
+##
+##        if abs(angle)>= 30 and abs(angle)< 60:
+##                t = (angle - 90) / 50
+##
+##        if abs(angle)>= 60:
+##                t = (angle - 90) / 200
+
+
+        
         rotateLeft = True
         
-        if time < 0:
+        if t < 0:
                 rotateLeft = False
 
         t = abs(t)
@@ -77,6 +93,12 @@ if __name__ == "__main__":
                         stop()
                         break
 
+
+
+if __name__ == "__main__":
+        angle = completeScan()
+        fixPosition(angle)        
+        
         d = us_dist(15)
 
         if d < 25:
