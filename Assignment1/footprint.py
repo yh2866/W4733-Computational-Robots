@@ -19,7 +19,12 @@ Distance1 = 43.5
 #    return [m+e-l, -np.sin(np.arctan(m/d)) - ((e**2+m**2-l**2)/(2*e*np.sqrt(m**2+d**2)))]
 
 def calculate_angle(alpha, d):
-    theta = 
+   m = 31.5/2
+   l = d*np.tan(alpha/2./180.*3.14)
+   theta = np.arctan(m/d)
+
+   return alpha - 2.*theta
+
 
 if __name__ == "__main__":
     angles = []
@@ -55,12 +60,12 @@ if __name__ == "__main__":
     alpha = angles[-1] - angles[0]
     print("alpha",angles[-1] - angles[0])
     d = us_dist(15)
-    m, e = calculate_angle(alpha, d)
-    print("m",m)
-    print("e",e)
-    theta0 = np.arctan(m/d)
-    theta = (alpha - theta0*2)
-    print("theta",theta)
+    print ("result",(calculate_angle(alpha, d))
+    #print("m",m)
+    #print("e",e)
+    #theta0 = np.arctan(m/d)
+    #theta = (alpha - theta0*2)
+    #print("theta",theta)
     #########################
 
     
