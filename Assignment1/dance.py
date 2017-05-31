@@ -36,8 +36,10 @@ if __name__ == "__main__":
         i = random.randint(0, 7)
         
         while True:
+            #Set move speed
             set_speed(speed_options[i])
             moveEnd = time.time()
+            #Set move actions
             if i >= 6:
                 servo(random.randint(0, 180))
             else:
