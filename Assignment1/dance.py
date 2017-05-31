@@ -32,19 +32,17 @@ if __name__ == "__main__":
             break
         
         moveStart = time.time()
-        #
+        #Randomly create options from 0~7
         i = random.randint(0, 7)
         
         while True:
             set_speed(speed_options[i])
             moveEnd = time.time()
-            print(i)
-
             if i >= 6:
                 servo(random.randint(0, 180))
             else:
                 move_options[i]()
-
+            #Set moving time of each action to 1
             if moveEnd - moveStart > 1:
                 break
         print("inner while ended")
