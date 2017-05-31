@@ -24,7 +24,7 @@ And the result angle is between 22~40 degree.
 For the Method 2, the geometic plot can be found on image "Q4_Method 2"
 We keep the robot in the front of object's edge, test it several times with different distance.
 And the result angle is between 52~60 degree.
-We prefer the method 2, therefore, for the result we guess it should be at range of 52~60 degree.
+We prefer the method 2, therefore, for the angles of beam, it should be at range of 52~60 degree.
 
 Problem 5:
 Code implementation is found in locate_object.py.
