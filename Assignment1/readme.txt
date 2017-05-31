@@ -1,3 +1,7 @@
+Group Name: Wall E
+Group Members: Yuanqing Hong (yh2866), Seung Hwan Lee (sl3966), Yuanfeng Mao (ym2576)
+
+
 Problem 1:
 Done.
 
