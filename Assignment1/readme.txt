@@ -31,6 +31,8 @@ We prefer the method 2, therefore, for the angles of beam, it should be at range
 
 Problem 5:
 Code implementation is found in locate_object.py.
+We let it turn left and detect distance alternatively. When it detect object that is less than 20cm, we will record this time and also we will record the time that cannot detect object. By turning a little back, we can let the robot stand in the front of object. And then move the robot forward untill detected distance is less than 20.
+In addition, we also consider the situation that the robot is originally close to object and the distance is less than 20cm. In this situation, we will let the robot to move backward.
 Please see the vedioes:
 https://youtu.be/Jezt_zl8YOs
 https://youtu.be/M09ESijY_gw
