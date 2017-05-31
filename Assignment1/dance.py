@@ -13,6 +13,16 @@ if __name__ == "__main__":
 
     }
 
+    speed_options = {0 : 30,
+                     1 : 60,
+                     2 : 90,
+                     3 : 120,
+                     4 : 150,
+                     5 : 180,
+                     6 : 210,
+                     7 : 240
+    }
+
     start = time.time()
 
     while True:
@@ -23,18 +33,19 @@ if __name__ == "__main__":
 
 
         moveStart = time.time()
-        i = random.randint(0, 6)
+        i = random.randint(0, 7)
 
         while True:
+            set_speed(speed_options[i])
             moveEnd = time.time()
             print(i)
 
-            if i == 6:
+            if i >= 6:
                 servo(random.randint(0, 180))
             else:
                 move_options[i]()
 
-            if moveEnd - moveStart > 2:
+            if moveEnd - moveStart > 1:
                 break
         print("inner while ended")
 
