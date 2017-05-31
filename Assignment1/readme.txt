@@ -7,11 +7,14 @@ Done.
 
 Problem 2:
 Code implementation is found in dance.py.
+We let it dance with different actions: move forward, move backward, turn right, turn left, swipe head.
+Also, we let it dance with different speed.
 Please see the vedio: 
 https://youtu.be/-OR-_qc2c5w
 
 Problem 3:
-Code implementation is found in sensor_accuracy.py. 
+Code implementation is found in sensor_accuracy.py.
+Using a while loop to let it detect distance all the time and put it into fixed distance compare the result with ruler.
 For 5 cm, the ultra sonic gave the correct measurement of 5 cm.
 For 30 cm, we got 38 cm.
 For 60 cm, we got 77 cm.
