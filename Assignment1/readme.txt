@@ -3,8 +3,8 @@ Done.
 
 Problem 2:
 file name: dance.py
-Please see the vedio:
-
+Please see the vedio: 
+https://youtu.be/-OR-_qc2c5w
 
 Problem 3:
 file name: sensor_accuracy.py
@@ -20,3 +20,4 @@ For the Method 2, please see the image of "Method 2"
 Problem 5:
 file name: locate_object.py
 Please see the vedio:
+
