@@ -28,7 +28,18 @@ def right_deg(deg=None):
         enc_tgt(1,0,pulse)
     right()
 
+    
+def fwd_cm(dist=None):
+    '''
+    Move chassis fwd by a specified number of cm.
+    This function sets the encoder to the correct number
+     of pulses and then invokes fwd().
+    '''
+    if dist is not None:
+        pulse = int(cm2pulse(dist))
+        enc_tgt(1,1,pulse)
+    fwd()
 
 if __name__ == '__main__':
     set_speed(1000)
-    move(10)
+    fwd_cm(10)
