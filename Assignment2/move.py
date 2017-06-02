@@ -116,5 +116,7 @@ if __name__ == '__main__':
     fwd_cm(10)
     X_change = 10
     update_pos(theta_change,X_change,0)
-
+    time.sleep(2)
+    fwd_cm(10)
+    update_pos(0,X_change,0)
 
