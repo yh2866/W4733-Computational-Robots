@@ -76,6 +76,9 @@ def transform_matrix(rotate_angle, x_move, y_move):
 
 
 def update_pos(theta_change, X_change, Y_change):
+    global X
+    global Y
+    global theta
     Original_Pos = [[X],[Y],1]
     Current_Pos = np.dot(transform_matrix(theta_change,X_change,Y_change),Original_Pos)
     X = Current_Pos[0]
