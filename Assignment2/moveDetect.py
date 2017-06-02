@@ -5,7 +5,7 @@ import numpy as np
 en_debug = 1
 
 DPR = 360.0/64
-WHEEL_RAD = 3.25 # Wheels are ~6.5 cm diameter. 
+WHEEL_RAD = 3.25 # Wheels are ~6.5 cm diameter.
 CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
 def left_deg(deg=None):
@@ -96,10 +96,19 @@ if __name__ == '__main__':
 
     left_deg(90)
     servo(0)
+
     while True:
+        servo(0)
+
         while detect(20):
-            fwd_cm(3)
-            
+            servo(90)
+
+            if not detect(20):
+                fwd_cm(3)
+            else:
+                left_deg(90)
+            servo(0)
+
         theta = 10
         count = 0
 
