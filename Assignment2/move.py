@@ -108,13 +108,13 @@ if __name__ == '__main__':
     set_speed(100)
     fwd_cm(10)
     X_change = 10
-    update_pos(0,10,0)
+    update_pos(0,X_change,0)
     time.sleep(2)
     right_deg(90)
     theta_change = 90
     time.sleep(3)
     fwd_cm(10)
     X_change = 10
-    update_pos(90,10,0)
+    update_pos(theta_change,X_change,0)
 
 
