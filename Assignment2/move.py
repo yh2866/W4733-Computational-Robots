@@ -5,6 +5,14 @@ DPR = 360.0/64
 WHEEL_RAD = 3.25 # Wheels are ~6.5 cm diameter. 
 en_debug=1
 
+X = 0
+X_move = 0
+Y = 0
+Y_move = 0
+theta = 0
+theta_move = 0
+
+
 def left_deg(deg=None):
     '''
     Turn chassis left by a specified number of degrees.
@@ -58,6 +66,27 @@ def cm2pulse(dist):
         print 'pulses',pulses
     return pulses
     
+
+def transform_matrix(rotate_angle, x_move, y_move):
+    T = [[np.cos(rotate_angle/180.*3.14), -np.sin(rotate_angle/180.*3.14), x_move],
+         [np.sin(rotate_angle/180.*3.14),  np.cos(rotate_angle/180.*3.14), y_move],
+         [              0               ,                  0             ,   1   ]]
+    return T
+
+
 if __name__ == '__main__':
     set_speed(100)
     fwd_cm(10)
+    X_move = 10
+    Original_Pos = [[X],[Y],[1]]
+    Current_Pos = np.dot(transform_matrix(0,X_move,0),Original_Pos)
+    right_deg(90)
+    theta_move = 90
+    theta += theta+move
+    fwd_cm(10)
+    X_move = 10
+    Current_Pos = np.dot(transform_matrix(theta_move, X_move,0),Current_Pos)
+    print "Current_Pos", Current_Pos
+    print "theta", theta
+
+
