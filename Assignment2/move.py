@@ -1,4 +1,5 @@
 from gopigo import *
+import numpy as np
 import time
 
 DPR = 360.0/64
@@ -6,11 +7,11 @@ WHEEL_RAD = 3.25 # Wheels are ~6.5 cm diameter.
 en_debug=1
 
 X = 0
-X_move = 0
+X_change = 0
 Y = 0
-Y_move = 0
+Y_change = 0
 theta = 0
-theta_move = 0
+theta_change = 0
 
 
 def left_deg(deg=None):
@@ -74,19 +75,23 @@ def transform_matrix(rotate_angle, x_move, y_move):
     return T
 
 
+
 if __name__ == '__main__':
     set_speed(100)
     fwd_cm(10)
-    X_move = 10
+    X_change = 10
     Original_Pos = [[X],[Y],[1]]
-    Current_Pos = np.dot(transform_matrix(0,X_move,0),Original_Pos)
+    Current_Pos = np.dot(transform_matrix(0,X_change,0),Original_Pos)
+    print "Current_Pos \n", Current_Pos
+    time.sleep(2)
     right_deg(90)
-    theta_move = 90
-    theta += theta+move
+    theta_change = 90
+    theta += theta_change
+    time.sleep(3)
     fwd_cm(10)
-    X_move = 10
-    Current_Pos = np.dot(transform_matrix(theta_move, X_move,0),Current_Pos)
-    print "Current_Pos", Current_Pos
+    X_change = 10
+    Current_Pos = np.dot(transform_matrix(theta_change, X_change,0),Current_Pos)
+    print "Current_Pos \n", Current_Pos
     print "theta", theta
 
 
