@@ -59,5 +59,5 @@ def cm2pulse(dist):
     return pulses
     
 if __name__ == '__main__':
-    set_speed(1000)
+    set_speed(100)
     fwd_cm(10)
