@@ -81,7 +81,9 @@ def update_pos(theta_change, X_change, Y_change):
     X = Current_Pos[0]
     Y = Current_Pos[1]
     theta += theta_change
-    print "theta, X, Y", theta,X,Y
+    print "theta", theta
+    print "X", X
+    print "Y", Y
 
 
 if __name__ == '__main__':
