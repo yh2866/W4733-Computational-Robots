@@ -2,6 +2,8 @@ from gopigo import *
 import time
 
 DPR = 360.0/64
+WHEEL_RAD = 3.25 # Wheels are ~6.5 cm diameter. 
+
 
 def left_deg(deg=None):
     '''
