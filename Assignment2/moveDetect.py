@@ -100,7 +100,7 @@ if __name__ == '__main__':
     while True:
         servo(0)
 
-        while detect(20):
+        while detect(20) and not detect(10):
             servo(90)
 
             if not detect(20):
@@ -112,9 +112,18 @@ if __name__ == '__main__':
         theta = 10
         count = 0
 
+        print("begin while not detect")
         while not detect(20):
-            right_deg(theta)
-            count += 1
+            servo(90)
+            
+            if not detect(20):
+                print("not detect")
+                right_deg(theta)
+                count += 1
+            else:
+                print("detect")
+                left_deg(90)
+            servo(0)
 
         fwd_cm(3)
 
