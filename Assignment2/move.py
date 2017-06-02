@@ -75,14 +75,41 @@ def transform_matrix(rotate_angle, x_move, y_move):
     return T
 
 
+def update_pos(theta_change, X_change, Y_change):
+    Original_Pos = [[X],[Y],1]
+    Current_Pos = np.dot(transform_matrix(0,X_change,0),Original_Pos)
+    X = Current_Pos[0]
+    Y = Current_Pos[1]
+    theta += theta_change
+    print "theta, X, Y", theta,X,Y
+
 
 if __name__ == '__main__':
+    # set_speed(100)
+    # fwd_cm(10)
+    # X_change = 10
+    # Original_Pos = [[X],[Y],[1]]
+    # Current_Pos = np.dot(transform_matrix(0,X_change,0),Original_Pos)
+    # print "Current_Pos \n", Current_Pos
+    # time.sleep(2)
+    # right_deg(90)
+    # theta_change = 90
+    # theta += theta_change
+    # time.sleep(3)
+    # fwd_cm(10)
+    # X_change = 10
+    # Current_Pos = np.dot(transform_matrix(theta_change, X_change,0),Current_Pos)
+    # print "Current_Pos \n", Current_Pos
+    # print "theta", theta
+
+
     set_speed(100)
     fwd_cm(10)
     X_change = 10
     Original_Pos = [[X],[Y],[1]]
-    Current_Pos = np.dot(transform_matrix(0,X_change,0),Original_Pos)
-    print "Current_Pos \n", Current_Pos
+    #Current_Pos = np.dot(transform_matrix(0,X_change,0),Original_Pos)
+    update_pos(0,10,0)
+    #print "Current_Pos \n", Current_Pos
     time.sleep(2)
     right_deg(90)
     theta_change = 90
@@ -90,8 +117,9 @@ if __name__ == '__main__':
     time.sleep(3)
     fwd_cm(10)
     X_change = 10
-    Current_Pos = np.dot(transform_matrix(theta_change, X_change,0),Current_Pos)
-    print "Current_Pos \n", Current_Pos
-    print "theta", theta
+    #Current_Pos = np.dot(transform_matrix(theta_change, X_change,0),Current_Pos)
+    update_pos(90,10,0)
+    #print "Current_Pos \n", Current_Pos
+    #print "theta", theta
 
 
