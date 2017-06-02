@@ -31,4 +31,4 @@ def right_deg(deg=None):
 
 if __name__ == '__main__':
     set_speed(1000)
-    left_deg(90)
+    move(10)
