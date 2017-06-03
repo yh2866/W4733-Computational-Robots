@@ -79,7 +79,7 @@ def update_pos(theta_change, X_change, Y_change):
     global X
     global Y
     global theta
-    Original_Pos = [[X],[Y],1]
+    Original_Pos = [[X],[Y],[1]]
     Current_Pos = np.dot(transform_matrix(theta_change,X_change,Y_change),Original_Pos)
     X = Current_Pos[0]
     Y = Current_Pos[1]
@@ -121,5 +121,5 @@ if __name__ == '__main__':
     update_pos(theta_change,X_change,0)
     time.sleep(2)
     fwd_cm(10)
-    update_pos(0,X_change,0)
+    update_pos(theta_change,X_change,0)
 
