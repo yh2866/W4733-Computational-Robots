@@ -88,9 +88,10 @@ def update_pos(theta_change, X_change, Y_change):
         theta -= 360
     if theta < -180:
         theta += 360
-    print "theta", theta
-    print "X", X
-    print "Y", Y
+    if en_debug:
+        print "theta", theta
+        print "X", X
+        print "Y", Y
 
 
 if __name__ == '__main__':
