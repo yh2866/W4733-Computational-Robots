@@ -84,6 +84,10 @@ def update_pos(theta_change, X_change, Y_change):
     X = Current_Pos[0]
     Y = Current_Pos[1]
     theta += theta_change
+    if theta > 180:
+        theta -= 360
+    if theta < -180:
+        theta += 360
     print "theta", theta
     print "X", X
     print "Y", Y
@@ -94,17 +98,77 @@ if __name__ == '__main__':
     Y_change = 0
     theta_change = 0
     set_speed(100)
-    fwd_cm(10)
-    X_change = 10
-    update_pos(0,X_change,0)
-    time.sleep(2)
-    right_deg(90)
-    theta_change = 90
-    update_pos(theta_change,0,0)
+
+##    #Test 1
+##    #Run a triangle to test
+##    #It will run back to start point
+##    theta_change = 60
+##    left_deg(theta_change)
+##    update_pos(theta_change,0,0)
+##    time.sleep(5)
+##    
+##    X_change = 50
+##    fwd_cm(X_change)
+##    update_pos(0,X_change,0)
+##    time.sleep(10)
+##    
+##    theta_change = 120
+##    left_deg(theta_change)
+##    update_pos(theta_change,0,0)
+##    time.sleep(5)
+##    
+##    fwd_cm(X_change)
+##    update_pos(0,X_change,0)
+##    time.sleep(10)
+##
+##    left_deg(theta_change)
+##    update_pos(theta_change,0,0)
+##    time.sleep(5)
+##    
+##    fwd_cm(X_change)
+##    update_pos(0,X_change,0)
+##    time.sleep(10)
+
+    #Test 2
+    #Keep turning
+    #It is finally reach 60 degrees
+    theta_change = 60
+    left_deg(theta_change)
     time.sleep(3)
-    fwd_cm(10)
-    X_change = 10
-    update_pos(0,X_change,0)
+    update_pos(theta_change,0,0)
+    
+    theta_change = 60
+    left_deg(theta_change)
     time.sleep(2)
-    fwd_cm(10)
-    update_pos(0,X_change,0)
+    update_pos(theta_change,0,0)
+    time.sleep(1)
+
+    theta_change = 60
+    left_deg(theta_change)
+    time.sleep(3)
+    update_pos(theta_change,0,0)
+    time.sleep(1)
+
+    theta_change = 60
+    left_deg(theta_change)
+    time.sleep(3)
+    update_pos(theta_change,0,0)
+    time.sleep(1)
+
+    theta_change = 60
+    left_deg(theta_change)
+    time.sleep(3)
+    update_pos(theta_change,0,0)
+    time.sleep(1)
+
+    theta_change = 60
+    left_deg(theta_change)
+    time.sleep(3)
+    update_pos(theta_change,0,0)
+    time.sleep(1)
+    
+    theta_change = 60
+    left_deg(theta_change)
+    time.sleep(3)
+    update_pos(theta_change,0,0)
+    time.sleep(1)
