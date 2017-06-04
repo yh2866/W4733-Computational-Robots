@@ -8,6 +8,14 @@ DPR = 360.0/64
 WHEEL_RAD = 3.25 # Wheels are ~6.5 cm diameter.
 CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
+X = 0.0
+Y = 0.0
+theta = 0
+Original_Pos = [[0],[0],[1]]
+Previous_Matrix = [[1, 0, 0],
+                   [0, 1, 0],
+                   [0, 0, 1]]
+
 def left_deg(deg=None):
     '''
     Turn chassis left by a specified number of degrees.
@@ -34,14 +42,19 @@ def right_deg(deg=None):
     right()
 
 
-def mapLoc(x, y, x_prime, y_prime, theta):
-    a = [[np.cos(theta), -np.sin(theta), x],
-                [np.sin(theta), np.cos(theta), y],
-                [0, 0, 1]]
-
-    p = np.transpose([[x_prime, y_prime, 1]])
-
-    return np.matmul(a, p)
+##def mapLoc(x, y, x_prime, y_prime, theta):
+##    a = [[np.cos(theta/180.*3.14), -np.sin(theta/180.*3.14), x],
+##                [np.sin(theta/180.*3.14), np.cos(theta/180.*3.14), y],
+##                [0, 0, 1]]
+##
+##    p = np.transpose([[x_prime, y_prime, 1]])
+##
+##    r = np.matmul(a, p)
+##
+##    x = r[0][0]
+##    y = r[0][1]
+##
+##    return x, y
 
 def detect(dist):
     SAMPLE = 5
@@ -82,19 +95,55 @@ def fwd_cm(dist=None):
         enc_tgt(1,1,pulse)
     fwd()
 
-def move(x, theta):
-    left_deg(theta)
+def transform_matrix(rotate_angle, x_move, y_move):
+    T = [[np.cos(rotate_angle/180.*3.14), -np.sin(rotate_angle/180.*3.14), x_move],
+         [np.sin(rotate_angle/180.*3.14),  np.cos(rotate_angle/180.*3.14), y_move],
+         [              0               ,                  0             ,   1   ]]
+    return T
 
-    fwd_cm(x)
+
+def update_pos(theta_change, X_change, Y_change):
+    global X
+    global Y
+    global theta
+    global Previous_Matrix
+    Previous_Matrix = np.dot(Previous_Matrix,transform_matrix(theta_change,X_change,Y_change))
+    Current_Pos = np.dot(Previous_Matrix,Original_Pos)
+    X = Current_Pos[0]
+    Y = Current_Pos[1]
+    theta += theta_change
+    if theta > 180:
+        theta -= 360
+    if theta < -180:
+        theta += 360
+    if en_debug:
+        print "theta", theta
+        print "X", X
+        print "Y", Y
+
 
 if __name__ == '__main__':
     servo(90)
     set_speed(100)
 
+    x = 0
+    y = 0
+    
     while not detect(20):
             fwd_cm(3)
+            update_pos(0,3,0)
+##            x, y = mapLoc(x, y, 3, 0, 0)
+##            print("x: ", x)
+##            print("y: ", y)
+
+            
 
     left_deg(90)
+    update_pos(90,0,0)
+    time.sleep(0.5)
+##    x, y = mapLoc(x, y, 0, 0, 90)
+##    print("x: ", x)
+##    print("y: ", y)
     servo(0)
 
     while True:
@@ -105,30 +154,45 @@ if __name__ == '__main__':
 
             if not detect(20):
                 fwd_cm(3)
+                update_pos(0,3,0)
+                time.sleep(0.5)
+##                x, y = mapLoc(x, y, 3, 0, 0)
+##                print("x: ", x)
+##                print("y: ", y)
             else:
                 left_deg(90)
+                update_pos(90,0,0)
+                time.sleep(0.5)
+##                x, y = mapLoc(x, y, 0, 0, 90)
+##                print("x: ", x)
+##                print("y: ", y)
             servo(0)
 
-        theta = 10
+        theta_change = 20
         count = 0
 
-        print("begin while not detect")
         while not detect(20):
             servo(90)
             
             if not detect(20):
                 print("not detect")
-                right_deg(theta)
-                count += 1
+                time.sleep(0.5)
+                right_deg(theta_change)
+                time.sleep(1)
+                update_pos(-theta_change,0,0)
+                time.sleep(1)
             else:
                 print("detect")
                 left_deg(90)
+                update_pos(90,0,0)
+                time.sleep(0.5)
+##                x, y = mapLoc(x, y, 0, 0, 90)
+##                print("x: ", x)
+##                print("y: ", y)
             servo(0)
 
-        fwd_cm(3)
+        
 
-    # move(10, 30)
-    # print(mapLoc(0, 0, 10, 0, 30))
 
 
 

@@ -100,10 +100,10 @@ if __name__ == '__main__':
     theta_change = 0
     set_speed(100)
 
-##    #Test 1
-##    #Run a triangle to test
-##    #It will run back to start point
-##    theta_change = 60
+    #Test 1
+    #Run a triangle to test
+    #It will run back to start point
+##    theta_change = 30
 ##    left_deg(theta_change)
 ##    update_pos(theta_change,0,0)
 ##    time.sleep(5)
@@ -133,43 +133,11 @@ if __name__ == '__main__':
     #Test 2
     #Keep turning
     #It is finally reach 60 degrees
-    theta_change = 60
-    left_deg(theta_change)
-    time.sleep(3)
-    update_pos(theta_change,0,0)
+    for i in range(18):
+        theta_change = 20
+        left_deg(27)
+        time.sleep(3)
+        update_pos(theta_change,0,0)
     
-    theta_change = 60
-    left_deg(theta_change)
-    time.sleep(2)
-    update_pos(theta_change,0,0)
-    time.sleep(1)
 
-    theta_change = 60
-    left_deg(theta_change)
-    time.sleep(3)
-    update_pos(theta_change,0,0)
-    time.sleep(1)
 
-    theta_change = 60
-    left_deg(theta_change)
-    time.sleep(3)
-    update_pos(theta_change,0,0)
-    time.sleep(1)
-
-    theta_change = 60
-    left_deg(theta_change)
-    time.sleep(3)
-    update_pos(theta_change,0,0)
-    time.sleep(1)
-
-    theta_change = 60
-    left_deg(theta_change)
-    time.sleep(3)
-    update_pos(theta_change,0,0)
-    time.sleep(1)
-    
-    theta_change = 60
-    left_deg(theta_change)
-    time.sleep(3)
-    update_pos(theta_change,0,0)
-    time.sleep(1)
