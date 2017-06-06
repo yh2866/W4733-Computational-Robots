@@ -3,7 +3,7 @@ def distance(x,y,k):
 
 def On_mline(x_goal, y_goal, x, y):
     #y=kx
-    error = 0.2
+    error = 3
     if(x_goal==0): #k not exist
         if(x<=error):
             return True

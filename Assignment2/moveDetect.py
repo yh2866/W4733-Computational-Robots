@@ -10,6 +10,8 @@ CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
 X = 0.0
 Y = 0.0
+X_Goal = 100.0
+Y_Goal = 0.0
 theta = 0
 Original_Pos = [[0],[0],[1]]
 Previous_Matrix = [[1, 0, 0],
@@ -121,29 +123,47 @@ def update_pos(theta_change, X_change, Y_change):
         print "X", X
         print "Y", Y
 
+    
+def isGoal(X, Y, X_Goal, Y_Goal):
+    return abs(X - X_Goal) <= 3 and abs(Y - Y_Goal) <= 3
+    
 
-if __name__ == '__main__':
+def distance(x,y,k):
+    return abs(y-k*x)/np.sqrt(1+k**2)
+
+
+def On_mline(x_goal, y_goal, x, y):
+    #y=kx
+    error = 3
+    if(x_goal==0): #k not exist
+        if(x<=error):
+            return True
+        else:
+            return False
+
+    k = y_goal/x_goal
+    dist = distance(x,y,k)
+    if(dist<=error):
+        return True
+    else:
+        return False
+
+def bug2():
     servo(90)
     set_speed(100)
 
-    x = 0
-    y = 0
     
     while not detect(20):
             fwd_cm(3)
             update_pos(0,3,0)
-##            x, y = mapLoc(x, y, 3, 0, 0)
-##            print("x: ", x)
-##            print("y: ", y)
+            if(isGoal(X,Y,X_Goal,Y_Goal)):
+                return
+                
 
-            
 
     left_deg(90)
     update_pos(90,0,0)
     time.sleep(0.5)
-##    x, y = mapLoc(x, y, 0, 0, 90)
-##    print("x: ", x)
-##    print("y: ", y)
     servo(0)
 
     while True:
@@ -156,19 +176,17 @@ if __name__ == '__main__':
                 fwd_cm(3)
                 update_pos(0,3,0)
                 time.sleep(0.5)
-##                x, y = mapLoc(x, y, 3, 0, 0)
-##                print("x: ", x)
-##                print("y: ", y)
+                if(isGoal(X,Y,X_Goal,Y_Goal)):
+                return
             else:
                 left_deg(90)
                 update_pos(90,0,0)
                 time.sleep(0.5)
-##                x, y = mapLoc(x, y, 0, 0, 90)
-##                print("x: ", x)
-##                print("y: ", y)
+                
             servo(0)
 
         theta_change = 20
+        theta_actual_change = 26
         count = 0
 
         while not detect(20):
@@ -177,7 +195,7 @@ if __name__ == '__main__':
             if not detect(20):
                 print("not detect")
                 time.sleep(0.5)
-                right_deg(theta_change)
+                right_deg(theta_actual_change)
                 time.sleep(1)
                 update_pos(-theta_change,0,0)
                 time.sleep(1)
@@ -186,10 +204,11 @@ if __name__ == '__main__':
                 left_deg(90)
                 update_pos(90,0,0)
                 time.sleep(0.5)
-##                x, y = mapLoc(x, y, 0, 0, 90)
-##                print("x: ", x)
-##                print("y: ", y)
             servo(0)
+
+
+if __name__ == '__main__':
+    
 
         
 

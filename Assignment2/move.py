@@ -6,7 +6,8 @@ DPR = 360.0/64
 WHEEL_RAD = 3.25 # Wheels are ~6.5 cm diameter. 
 en_debug=1
 
-
+X = 0
+Y = 0
 theta = 0
 Original_Pos = [[0],[0],[1]]
 Previous_Matrix = [[1, 0, 0],
@@ -93,8 +94,31 @@ def update_pos(theta_change, X_change, Y_change):
         print "X", X
         print "Y", Y
 
+def distance(x,y,k):
+    return abs(y-k*x)/np.sqrt(1+k**2)
+
+def On_mline(x_goal, y_goal, x, y):
+    #y=kx
+    error = 3
+    if(x_goal==0): #k not exist
+        if(x<=error):
+            return True
+        else:
+            return False
+
+    k = y_goal/x_goal
+    dist = distance(x,y,k)
+    if(dist<=error):
+        print "In the line"
+        return True
+    else:
+        print "Out the line"
+        return False
 
 if __name__ == '__main__':
+    x_goal = 0
+    y_goal = 10
+    
     X_change = 0
     Y_change = 0
     theta_change = 0
@@ -134,10 +158,28 @@ if __name__ == '__main__':
     #Keep turning
     #It is finally reach 60 degrees
     for i in range(18):
+        print(i)
         theta_change = 20
-        left_deg(27)
+        left_deg(26)
         time.sleep(3)
         update_pos(theta_change,0,0)
+
+    #Test 3
+##    X_change = 1
+##    Y_change = 1
+##    while True:
+##        update_pos(0,0,Y_change)
+##        update_pos(0,X_change,0)
+##        if On_mline(x_goal, y_goal, X, Y) == False:
+##            break
+##        time.sleep(1)
+        
+##    update_pos(0,X_change,0)
+##    On_mline(x_goal, y_goal, X, Y)
+##    update_pos(0,X_change,0)
+##    On_mline(x_goal, y_goal, X, Y)
+##    update_pos(0,X_change,0)
+##    On_mline(x_goal, y_goal, X, Y)
     
 
 
