@@ -200,9 +200,8 @@ def avoidObject():
                 right_deg(theta)
                 servo(90)
 
-
-
-
+                if(bug2()):
+                    return
 
         theta_change = 20
         theta_actual_change = 26
@@ -231,7 +230,7 @@ def bug2():
     set_speed(100)
 
     if isGoal(X_Goal, Y_Goal, X, Y):
-        return
+        return True
     else:
         while not detect(20):
             fwd_cm(3)
