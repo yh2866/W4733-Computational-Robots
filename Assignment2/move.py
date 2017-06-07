@@ -157,10 +157,10 @@ if __name__ == '__main__':
     #Test 2
     #Keep turning
     #It is finally reach 60 degrees
-    for i in range(18):
+    for i in range(9):
         print(i)
         theta_change = 20
-        left_deg(26)
+        right_deg(-26)
         time.sleep(3)
         update_pos(theta_change,0,0)
 

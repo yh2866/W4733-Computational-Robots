@@ -169,8 +169,9 @@ def on_Mline(x_goal, y_goal, x, y):
 
 
 def avoidObject():
-
-    left_deg(90)
+    obstacle_move = 0
+    left_deg(110)
+    time.sleep(1)
     update_pos(90,0,0)
     time.sleep(0.5)
 
@@ -183,20 +184,30 @@ def avoidObject():
 
             if not detect(20):
                 fwd_cm(3)
+                obstacle_move += 3
                 onGoal, onMLine = posFeedback(0, 3, 0)
+                
             else:
                 left_deg(90)
                 update_pos(90,0,0)
-                time.sleep(0.5)
+                time.sleep(1)
 
             servo(0)
 
             if onGoal:
                 return
-            else if onMLine:
-                right_deg(theta)
-                servo(90)
+            elif onMLine and obstacle_move>10:
+                if theta < 0:
+                    left_deg(abs(theta))
+                else:
+                    right_deg(theta)
 
+                update_pos(-theta, 0, 0)
+                    
+                servo(90)
+                print("On M Line !!! ")
+                print("On M Line !!! ")
+                print("On M Line !!! ")
                 if(bug2()):
                     return
 
@@ -248,3 +259,4 @@ def bug2():
 
 
 if __name__ == '__main__':
+    bug2()
