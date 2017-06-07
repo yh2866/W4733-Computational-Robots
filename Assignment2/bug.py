@@ -126,7 +126,7 @@ def update_pos(theta_change, X_change, Y_change):
 
 
 def isGoal(X_Goal, Y_Goal, X, Y):
-    return abs(X - X_Goal) <= 3 and abs(Y - Y_Goal) <= 3
+    return abs(X - X_Goal) <= 5 and abs(Y - Y_Goal) <= 5
 
 
 
@@ -153,7 +153,7 @@ def distance(x,y,k):
 
 def on_Mline(x_goal, y_goal, x, y):
     #y=kx
-    error = 3
+    error = 5
     if(x_goal==0): #k not exist
         if(x<=error):
             return True
@@ -167,15 +167,12 @@ def on_Mline(x_goal, y_goal, x, y):
     else:
         return False
 
-def mLineMove():
-
 
 def avoidObject():
 
     left_deg(90)
     update_pos(90,0,0)
     time.sleep(0.5)
-    servo(0)
 
     while True:
         servo(0)
