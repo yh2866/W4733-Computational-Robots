@@ -303,7 +303,7 @@ def avoidObjectOnRight():
                     return
                 elif onMLine and obstacle_move>10:
                     if len(MLINE_X) == 0 or \
-                       (len(MLINE_X) > 0 and (X ** 2 + Y ** 2) < (MLINE_X[-1]**2 + MLINE_Y[-1]**2)):
+                       (len(MLINE_X) > 0 and ((X_Goal - X) ** 2 + (Y_Goal - Y) ** 2) < ((X_Goal - MLINE_X[-1])**2 + (Y_Goal - MLINE_Y[-1])**2)):
                         MLINE_X.append(X)
                         MLINE_Y.append(Y)
 
