@@ -54,20 +54,6 @@ def right_deg(deg=None):
     right()
 
 
-##def mapLoc(x, y, x_prime, y_prime, theta):
-##    a = [[np.cos(theta/180.*3.14), -np.sin(theta/180.*3.14), x],
-##                [np.sin(theta/180.*3.14), np.cos(theta/180.*3.14), y],
-##                [0, 0, 1]]
-##
-##    p = np.transpose([[x_prime, y_prime, 1]])
-##
-##    r = np.matmul(a, p)
-##
-##    x = r[0][0]
-##    y = r[0][1]
-##
-##    return x, y
-
 def detect(dist):
     SAMPLE = 6
     REQUIRED = 3
@@ -179,92 +165,8 @@ def on_Mline(x_goal, y_goal, x, y):
     else:
         return False
 
-def avoidObjectOnLeft():
-    obstacle_move = 0
-    right_deg(110)
-    time.sleep(1)
-    update_pos(-90,0,0)
-    time.sleep(0.5)
-    scale = 1.2
 
-    onGoal = False
-    onMLine = False
-
-    while True:
-        servo(180)
-
-        while True:
-
-            # move forward
-            while detect(20) and not detect(5):
-                servo(90)
-
-                if not detect(20):
-                    OBSTACLE_X.append(X)
-                    OBSTACLE_Y.append(Y + 20)
-                    fwd_cm(3)
-                    obstacle_move += 3
-                    onGoal, onMLine = posFeedback(0, 3, 0)
-
-                else:
-                    OBSTACLE_X.append(X - 20)
-                    OBSTACLE_Y.append(Y)
-                    right_deg(90)
-                    update_pos(-90,0,0)
-                    time.sleep(1)
-
-                servo(180)
-
-                if onGoal:
-                    return
-                elif onMLine and obstacle_move>10: #
-                    final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
-                    rot_angle = final_angle - theta
-                    if rot_angle < 0:
-                        right_deg(abs(rot_angle)*scale)
-                        update_pos(-abs(rot_angle), 0, 0)
-                    else:
-                        left_deg(abs(rot_angle)*scale)
-                        update_pos(abs(rot_angle), 0, 0)
-
-                    servo(90)
-                    print("On M Line !!! ")
-                    print("On M Line !!! ")
-                    print("On M Line !!! ")
-
-                    if(bug2()):
-                        return
-
-            servo(180)
-
-            if not detect(20):
-                break
-            else:
-                right_deg(22)
-                update_pos(-20, 0, 0)
-
-        theta_change = 20
-        theta_actual_change = 26
-
-        # for rotation to avoid object
-        while not detect(20):
-            servo(90)
-
-            if not detect(20):
-                print("not detect")
-                time.sleep(0.5)
-                left_deg(theta_actual_change)
-                time.sleep(1)
-                update_pos(theta_change,0,0)
-                time.sleep(1)
-            else:
-                print("detect")
-                right_deg(60)
-                update_pos(-60,0,0)
-                time.sleep(0.5)
-            servo(0)
-
-def avoidObjectOnRight():
+def avoidObject():
     obstacle_move = 0
     left_deg(110)
     time.sleep(1)
@@ -301,11 +203,19 @@ def avoidObjectOnRight():
 
                 if onGoal:
                     return
+
+                elif onMLine and len(MLINE_X) > 0:
+				       for i in range(MLINE_X):
+				          if MLINE_X[i] - X <= ERROR_mline and MLINE_Y[i] - Y <= ERROR_mline:
+				            print("second visit m-line!")
+
                 elif onMLine and obstacle_move>10:
                     if len(MLINE_X) == 0 or \
                        (len(MLINE_X) > 0 and ((X_Goal - X) ** 2 + (Y_Goal - Y) ** 2) < ((X_Goal - MLINE_X[-1])**2 + (Y_Goal - MLINE_Y[-1])**2)):
                         MLINE_X.append(X)
                         MLINE_Y.append(Y)
+
+
 
                    final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
                    print "final_angle ", final_angle
@@ -390,21 +300,9 @@ def bug2():
             if onGoal:
                 plot_path()
                 return True
-
     
-    secondVisitMLinePoint = False
-    
-    # check if this is the second visit
-    if onMLine and len(MLINE_X) > 0:
-       for i in range(MLINE_X):
-          if MLINE_X[i] - X <= ERROR_mline and MLINE_Y[i] - Y <= ERROR_mline:
-            secondVisitMLinePoint = True
-           
 
-    if secondVisitMLinePoint:        
-        avoidObjectOnLeft()
-    else:
-        avoidObjectOnRight()
+    avoidObject()
 
 
 
