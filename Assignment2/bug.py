@@ -189,12 +189,12 @@ def avoidObjectOnLeft():
 
     onGoal = False
     onMLine = False
-    
+
     while True:
         servo(180)
 
         while True:
-            
+
             # move forward
             while detect(20) and not detect(5):
                 servo(90)
@@ -205,7 +205,7 @@ def avoidObjectOnLeft():
                     fwd_cm(3)
                     obstacle_move += 3
                     onGoal, onMLine = posFeedback(0, 3, 0)
-                    
+
                 else:
                     OBSTACLE_X.append(X - 20)
                     OBSTACLE_Y.append(Y)
@@ -218,15 +218,15 @@ def avoidObjectOnLeft():
                 if onGoal:
                     return
                 elif onMLine and obstacle_move>10: #
-##                    final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180 
-##                    rot_angle = final_angle - theta
-##                    if rot_angle < 0:
-##                        right_deg(abs(rot_angle)*scale)
-##                        update_pos(-abs(rot_angle), 0, 0)
-##                    else:
-##                        left_deg(abs(rot_angle)*scale)
-##                        update_pos(abs(rot_angle), 0, 0)
-                        
+                    final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
+                    rot_angle = final_angle - theta
+                    if rot_angle < 0:
+                        right_deg(abs(rot_angle)*scale)
+                        update_pos(-abs(rot_angle), 0, 0)
+                    else:
+                        left_deg(abs(rot_angle)*scale)
+                        update_pos(abs(rot_angle), 0, 0)
+
                     servo(90)
                     print("On M Line !!! ")
                     print("On M Line !!! ")
@@ -236,7 +236,7 @@ def avoidObjectOnLeft():
                         return
 
             servo(180)
-            
+
             if not detect(20):
                 break
             else:
@@ -274,7 +274,7 @@ def avoidObjectOnRight():
 
     onGoal = False
     onMLine = False
-    
+
     while True:
         servo(0)
 
@@ -289,7 +289,7 @@ def avoidObjectOnRight():
                     fwd_cm(3)
                     obstacle_move += 3
                     onGoal, onMLine = posFeedback(0, 3, 0)
-                    
+
                 else:
                     OBSTACLE_X.append(X + 20)
                     OBSTACLE_Y.append(Y)
@@ -306,25 +306,25 @@ def avoidObjectOnRight():
                        (len(MLINE_X) > 0 and (X ** 2 + Y ** 2) < (MLINE_X[-1]**2 + MLINE_Y[-1]**2)):
                         MLINE_X.append(X)
                         MLINE_Y.append(Y)
-                    
-##                    final_angle = np.arctan((Y_Goal/ X_Goal) / 3.14 * 180) 
-##                    print "final_angle ", final_angle
-                    
-                    rot_angle = -theta
-                    
+
+                   final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
+                   print "final_angle ", final_angle
+
+                    rot_angle = final_angle - theta
+
                     if rot_angle < 0:
                         right_deg(abs(rot_angle)*scale)
                         update_pos(-abs(rot_angle), 0, 0)
                     else:
                         left_deg(abs(rot_angle)*scale)
                         update_pos(abs(rot_angle), 0, 0)
-                        
+
                     servo(90)
                     print("On M Line !!! ")
                     print("On M Line !!! ")
                     print("On M Line !!! ")
 
-                    
+
 
                     if(bug2()):
                         return
@@ -377,25 +377,8 @@ def bug2():
     servo(90)
     set_speed(100)
     scale = 1.2
-    
-    
-    if X_Goal != 0 and Y_Goal > 0:
-        print '(Y_Goal/ X_Goal) / 3.14 * 180',np.arctan((Y_Goal/ X_Goal) / 3.14 * 180)
-        left_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
-        left_deg(left_angle*scale)
-        print 'left_angle', left_angle
-        update_pos(left_angle,0,0)
-    elif X_Goal != 0 and Y_Goal < 0:
-        right_angle = np.arctan(-(Y_Goal/ X_Goal)) / 3.14 * 180
-        right_deg(right_angle)
-        update_pos(-right_angle,0,0)
-    elif X_Goal == 0 and Y_Goal < 0:
-        right_deg(90)
-        update_pos(-90,0,0)
-    elif X_Goal == 0 and Y_Goal > 0:
-        left_deg(90)
-        update_pos(90,0,0)
-        
+
+
     if isGoal(X_Goal, Y_Goal, X, Y):
         plot_path()
         return True
@@ -420,5 +403,22 @@ def bug2():
 
 
 if __name__ == '__main__':
+    if X_Goal != 0 and Y_Goal > 0:
+        print '(Y_Goal/ X_Goal) / 3.14 * 180',np.arctan((Y_Goal/ X_Goal) / 3.14 * 180)
+        left_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
+        left_deg(left_angle*scale)
+        print 'left_angle', left_angle
+        update_pos(left_angle,0,0)
+    elif X_Goal != 0 and Y_Goal < 0:
+        right_angle = np.arctan(-(Y_Goal/ X_Goal)) / 3.14 * 180
+        right_deg(right_angle)
+        update_pos(-right_angle,0,0)
+    elif X_Goal == 0 and Y_Goal < 0:
+        right_deg(90)
+        update_pos(-90,0,0)
+    elif X_Goal == 0 and Y_Goal > 0:
+        left_deg(90)
+        update_pos(90,0,0)
+
     bug2()
     plt.savefig("result.png")
