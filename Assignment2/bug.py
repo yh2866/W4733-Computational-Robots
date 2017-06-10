@@ -391,11 +391,17 @@ def bug2():
                 plot_path()
                 return True
 
-    # Save the m-lines that has been
-    # If already been there, save the points
-    # And use the closest point
-    if onMLine and len(MLINE_X) > 0 \
-       and abs(MLINE_X[-1] - X) <= ERROR_mline and abs(MLINE_Y[-1] - Y) <= ERROR_mline:
+    
+    secondVisitMLinePoint = False
+    
+    # check if this is the second visit
+    if onMLine and len(MLINE_X) > 0:
+       for i in range(MLINE_X):
+          if MLINE_X[i] - X <= ERROR_mline and MLINE_Y[i] - Y <= ERROR_mline:
+            secondVisitMLinePoint = True
+           
+
+    if secondVisitMLinePoint:        
         avoidObjectOnLeft()
     else:
         avoidObjectOnRight()
