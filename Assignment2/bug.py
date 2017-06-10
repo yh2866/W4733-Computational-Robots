@@ -391,7 +391,9 @@ def bug2():
                 plot_path()
                 return True
 
-    # now we've detected an object
+    # Save the m-lines that has been
+    # If already been there, save the points
+    # And use the closest point
     if onMLine and len(MLINE_X) > 0 \
        and abs(MLINE_X[-1] - X) <= ERROR_mline and abs(MLINE_Y[-1] - Y) <= ERROR_mline:
         avoidObjectOnLeft()
@@ -403,6 +405,7 @@ def bug2():
 
 
 if __name__ == '__main__':
+    #Let the robot turn to the direction of the final goal
     if X_Goal != 0 and Y_Goal > 0:
         print '(Y_Goal/ X_Goal) / 3.14 * 180',np.arctan((Y_Goal/ X_Goal) / 3.14 * 180)
         left_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
@@ -419,6 +422,7 @@ if __name__ == '__main__':
     elif X_Goal == 0 and Y_Goal > 0:
         left_deg(90)
         update_pos(90,0,0)
-
+    #Run bug2 algorithm
     bug2()
+    #Save trajectory picture
     plt.savefig("result.png")
