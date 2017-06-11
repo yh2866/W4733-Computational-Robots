@@ -14,7 +14,7 @@ Y = 0.0
 X_Goal = 200.0
 Y_Goal = 0.0
 theta = 0
-ERROR_mline = 3
+ERROR_mline = 4
 ERROR_goal = 3
 Plot_X = []
 Plot_Y = []
@@ -167,6 +167,7 @@ def on_Mline(x_goal, y_goal, x, y):
 
 
 def avoidObject():
+    obstacle_move = 0
     left_deg(55)
     time.sleep(0.2)
     update_pos(45,0,0)
@@ -191,8 +192,9 @@ def avoidObject():
                 if not detect(20):
                     OBSTACLE_X.append(X)
                     OBSTACLE_Y.append(Y - 20)
-                    fwd_cm(3)
-                    onGoal, onMLine = posFeedback(0, 3, 0)
+                    fwd_cm(4)
+                    obstacle_move += 4
+                    onGoal, onMLine = posFeedback(0, 4, 0)
 
                 # object to the front and also object next to gopigo. Avoid it
                 else:
@@ -218,7 +220,7 @@ def avoidObject():
                         secondVisitMLine = True
 
 
-                elif onMLine and not secondVisitMLine:
+                elif onMLine and obstacle_move > 10:
                     print("On M Line !!! ")
 
 
@@ -324,8 +326,8 @@ def bug2():
         return True
     else:
         while not detect(20):
-            fwd_cm(3)
-            onGoal, onMLine = posFeedback(0, 3, 0)
+            fwd_cm(4)
+            onGoal, onMLine = posFeedback(0, 4, 0)
 
 
             if onGoal:
