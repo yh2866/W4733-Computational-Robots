@@ -55,8 +55,8 @@ def right_deg(deg=None):
 
 
 def detect(dist):
-    SAMPLE = 5
-    REQUIRED = 3
+    SAMPLE = 4
+    REQUIRED = 2
 
     sampling = []
     for j in range(SAMPLE):
