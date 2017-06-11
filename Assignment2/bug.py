@@ -181,6 +181,8 @@ def avoidObject():
         servo(0)
 
         while True:
+
+            obstacle_move = 0
             # move forward
             while detect(20) and not detect(10):
                 servo(90)
@@ -210,15 +212,18 @@ def avoidObject():
                         print("second visit m-line!")
 
                 elif onMLine and obstacle_move>10:
+                    print("On M Line !!! ")
+                    print("X ", X)
+                    print("Y ", Y)
+
                     if len(MLINE_X) == 0 or \
                        (len(MLINE_X) > 0 and ((X_Goal - X) ** 2 + (Y_Goal - Y) ** 2) < ((X_Goal - MLINE_X[-1])**2 + (Y_Goal - MLINE_Y[-1])**2)):
                         MLINE_X.append(X)
                         MLINE_Y.append(Y)
 
-                        final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
-                        print "final_angle ", final_angle
+                        # final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
 
-                        rot_angle = final_angle - theta
+                        rot_angle = -theta
 
                         if rot_angle < 0:
                             right_deg(abs(rot_angle)*scale)
@@ -228,13 +233,6 @@ def avoidObject():
                             update_pos(rot_angle, 0, 0)
 
                         servo(90)
-                        print("On M Line !!! ")
-                        print("On M Line !!! ")
-                        print("On M Line !!! ")
-                        print("X ", X)
-                        print("Y ", Y)
-
-
 
                         if(bug2()):
                             return
@@ -249,7 +247,7 @@ def avoidObject():
 
 
         servo(0)
-        
+
         theta_change = 20
         theta_actual_change = 26
 
@@ -291,30 +289,7 @@ def bug2():
     set_speed(100)
     scale = 1.2
 
-
-    if isGoal(X_Goal, Y_Goal, X, Y):
-        plot_path()
-        return True
-    else:
-        while not detect(20):
-            fwd_cm(3)
-            onGoal, onMLine = posFeedback(0, 3, 0)
-
-            if onGoal:
-                plot_path()
-                return True
-    
-
-    avoidObject()
-
-
-
-
-
-if __name__ == '__main__':
     #Let the robot turn to the direction of the final goal
-    scale = 1.2
-    
     if X_Goal != 0 and Y_Goal > 0:
         print '(Y_Goal/ X_Goal) / 3.14 * 180',np.arctan((Y_Goal/ X_Goal) / 3.14 * 180)
         left_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
@@ -331,6 +306,32 @@ if __name__ == '__main__':
     elif X_Goal == 0 and Y_Goal > 0:
         left_deg(90)
         update_pos(90,0,0)
+
+
+    if isGoal(X_Goal, Y_Goal, X, Y):
+        plot_path()
+        return True
+    else:
+        while not detect(20):
+            fwd_cm(3)
+            onGoal, onMLine = posFeedback(0, 3, 0)
+
+            if len(MLINE_X) == 0 or \
+                (len(MLINE_X) > 0 and ((X_Goal - X) ** 2 + (Y_Goal - Y) ** 2) < ((X_Goal - MLINE_X[-1])**2 + (Y_Goal - MLINE_Y[-1])**2)):
+                MLINE_X.append(X)
+                MLINE_Y.append(Y)
+
+            if onGoal:
+                plot_path()
+                return True
+
+    avoidObject()
+
+
+
+
+
+if __name__ == '__main__':
     #Run bug2 algorithm
     bug2()
     #Save trajectory picture
