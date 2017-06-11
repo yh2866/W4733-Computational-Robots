@@ -11,8 +11,8 @@ CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
 X = 0.0
 Y = 0.0
-X_Goal = 100.0
-Y_Goal = 100.0
+X_Goal = 200.0
+Y_Goal = 0.0
 theta = 0
 ERROR_mline = 3
 ERROR_goal = 3
@@ -168,9 +168,9 @@ def on_Mline(x_goal, y_goal, x, y):
 
 def avoidObject():
     obstacle_move = 0
-    left_deg(110)
+    left_deg(55)
     time.sleep(1)
-    update_pos(90,0,0)
+    update_pos(45,0,0)
     time.sleep(0.5)
     scale = 1.2
 
@@ -195,8 +195,8 @@ def avoidObject():
                 else:
                     OBSTACLE_X.append(X + 20)
                     OBSTACLE_Y.append(Y)
-                    left_deg(90)
-                    update_pos(90,0,0)
+                    left_deg(55)
+                    update_pos(45,0,0)
                     time.sleep(1)
 
                 servo(0)
@@ -205,9 +205,9 @@ def avoidObject():
                     return
 
                 elif onMLine and len(MLINE_X) > 0:
-				       for i in range(MLINE_X):
-				          if MLINE_X[i] - X <= ERROR_mline and MLINE_Y[i] - Y <= ERROR_mline:
-				            print("second visit m-line!")
+                   for i in range(MLINE_X):
+                      if MLINE_X[i] - X <= ERROR_mline and MLINE_Y[i] - Y <= ERROR_mline:
+                        print("second visit m-line!")
 
                 elif onMLine and obstacle_move>10:
                     if len(MLINE_X) == 0 or \
@@ -215,29 +215,29 @@ def avoidObject():
                         MLINE_X.append(X)
                         MLINE_Y.append(Y)
 
+                        final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
+                        print "final_angle ", final_angle
+
+                        rot_angle = final_angle - theta
+
+                        if rot_angle < 0:
+                            right_deg(abs(rot_angle)*scale)
+                            update_pos(rot_angle, 0, 0)
+                        else:
+                            left_deg(abs(rot_angle)*scale)
+                            update_pos(rot_angle, 0, 0)
+
+                        servo(90)
+                        print("On M Line !!! ")
+                        print("On M Line !!! ")
+                        print("On M Line !!! ")
+                        print("X ", X)
+                        print("Y ", Y)
 
 
-                   final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
-                   print "final_angle ", final_angle
 
-                    rot_angle = final_angle - theta
-
-                    if rot_angle < 0:
-                        right_deg(abs(rot_angle)*scale)
-                        update_pos(-abs(rot_angle), 0, 0)
-                    else:
-                        left_deg(abs(rot_angle)*scale)
-                        update_pos(abs(rot_angle), 0, 0)
-
-                    servo(90)
-                    print("On M Line !!! ")
-                    print("On M Line !!! ")
-                    print("On M Line !!! ")
-
-
-
-                    if(bug2()):
-                        return
+                        if(bug2()):
+                            return
 
             servo(0)
 
@@ -247,6 +247,9 @@ def avoidObject():
                 left_deg(22)
                 update_pos(20, 0, 0)
 
+
+        servo(0)
+        
         theta_change = 20
         theta_actual_change = 26
 
@@ -263,8 +266,8 @@ def avoidObject():
                 time.sleep(1)
             else:
                 print("detect")
-                left_deg(60)
-                update_pos(60,0,0)
+                left_deg(55)
+                update_pos(45,0,0)
                 time.sleep(0.5)
             servo(0)
 
@@ -310,6 +313,8 @@ def bug2():
 
 if __name__ == '__main__':
     #Let the robot turn to the direction of the final goal
+    scale = 1.2
+    
     if X_Goal != 0 and Y_Goal > 0:
         print '(Y_Goal/ X_Goal) / 3.14 * 180',np.arctan((Y_Goal/ X_Goal) / 3.14 * 180)
         left_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
