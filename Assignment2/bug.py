@@ -55,12 +55,12 @@ def right_deg(deg=None):
 
 
 def detect(dist):
-    SAMPLE = 6
+    SAMPLE = 5
     REQUIRED = 3
 
     sampling = []
     for j in range(SAMPLE):
-        time.sleep(0.2)
+        time.sleep(0.07)
 
         d = us_dist(15)
         print(d)
