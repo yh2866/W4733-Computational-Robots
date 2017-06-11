@@ -167,7 +167,6 @@ def on_Mline(x_goal, y_goal, x, y):
 
 
 def avoidObject():
-    obstacle_move = 0
     left_deg(55)
     time.sleep(0.2)
     update_pos(45,0,0)
@@ -185,7 +184,6 @@ def avoidObject():
 
             # check object next to gopigo
             while detect(20) and not detect(10):
-
                 # check front too
                 servo(90)
 
@@ -194,7 +192,6 @@ def avoidObject():
                     OBSTACLE_X.append(X)
                     OBSTACLE_Y.append(Y - 20)
                     fwd_cm(3)
-                    obstacle_move += 3
                     onGoal, onMLine = posFeedback(0, 3, 0)
 
                 # object to the front and also object next to gopigo. Avoid it
@@ -220,7 +217,7 @@ def avoidObject():
                         print("second visit m-line!")
                         secondVisitMLine = True
 
-                #
+
                 elif onMLine and not secondVisitMLine:
                     print("On M Line !!! ")
 
@@ -230,7 +227,7 @@ def avoidObject():
                         MLINE_X.append(X)
                         MLINE_Y.append(Y)
 
-                       print("MLINE VALUE PUSH")
+                        print("MLINE VALUE PUSH")
                         print("X ", X)
                         print("Y ", Y)
                         print("--------------")
@@ -271,7 +268,6 @@ def avoidObject():
                 print("not detect")
                 time.sleep(0.1)
                 right_deg(theta_actual_change)
-                time.sleep(0.1)
                 update_pos(-theta_change,0,0)
                 time.sleep(0.1)
             else:
