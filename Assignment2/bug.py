@@ -55,7 +55,7 @@ def right_deg(deg=None):
 
 
 def detect(dist):
-    SAMPLE = 6
+    SAMPLE = 5
     REQUIRED = 3
 
     sampling = []
@@ -133,7 +133,7 @@ def posFeedback(theta_change, X_change, Y_change):
     onMLine = False
 
     update_pos(theta_change, X_change, Y_change)
-    time.sleep(0.5)
+    time.sleep(0.07)
 
     if isGoal(X_Goal, Y_Goal, X, Y):
         onGoal = True
@@ -169,24 +169,27 @@ def on_Mline(x_goal, y_goal, x, y):
 def avoidObject():
     obstacle_move = 0
     left_deg(55)
-    time.sleep(1)
+    time.sleep(0.07)
     update_pos(45,0,0)
-    time.sleep(0.5)
+    time.sleep(0.07)
     scale = 1.2
 
     onGoal = False
     onMLine = False
 
     while True:
-        servo(0)
 
         while True:
-
-            obstacle_move = 0
             # move forward
+            servo(0)
+
+            # check object next to gopigo
             while detect(20) and not detect(10):
+
+                # check front too
                 servo(90)
 
+                # no object front, but we have an object next. so we move forward
                 if not detect(20):
                     OBSTACLE_X.append(X)
                     OBSTACLE_Y.append(Y - 20)
@@ -194,34 +197,43 @@ def avoidObject():
                     obstacle_move += 3
                     onGoal, onMLine = posFeedback(0, 3, 0)
 
+                # object to the front and also object next to gopigo. Avoid it
                 else:
                     OBSTACLE_X.append(X + 20)
                     OBSTACLE_Y.append(Y)
                     left_deg(55)
                     update_pos(45,0,0)
-                    time.sleep(1)
+                    time.sleep(0.07)
+                    onMLine = False
+                    onGoal = False
 
-                servo(0)
+                secondVisitMLine = False
+
 
                 if onGoal:
                     return
 
+                # check if we've been on this mline
                 elif onMLine and len(MLINE_X) > 0:
                    for i in range(MLINE_X):
                       if MLINE_X[i] - X <= ERROR_mline and MLINE_Y[i] - Y <= ERROR_mline:
                         print("second visit m-line!")
+                        secondVisitMLine = True
 
-                elif onMLine and obstacle_move>10:
+                #
+                elif onMLine and not secondVisitMLine:
                     print("On M Line !!! ")
-                    print("X ", X)
-                    print("Y ", Y)
+
 
                     if len(MLINE_X) == 0 or \
                        (len(MLINE_X) > 0 and ((X_Goal - X) ** 2 + (Y_Goal - Y) ** 2) < ((X_Goal - MLINE_X[-1])**2 + (Y_Goal - MLINE_Y[-1])**2)):
                         MLINE_X.append(X)
                         MLINE_Y.append(Y)
 
-                        # final_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
+                       print("MLINE VALUE PUSH")
+                        print("X ", X)
+                        print("Y ", Y)
+                        print("--------------")
 
                         rot_angle = -theta
 
@@ -242,7 +254,7 @@ def avoidObject():
             if not detect(20):
                 break
             else:
-                left_deg(22)
+                left_deg(26)
                 update_pos(20, 0, 0)
 
 
@@ -251,22 +263,22 @@ def avoidObject():
         theta_change = 20
         theta_actual_change = 26
 
-        # for rotation to avoid object
+        # object next to gopigo too far away. Need to get closer to it.
         while not detect(20):
             servo(90)
 
             if not detect(20):
                 print("not detect")
-                time.sleep(0.5)
+                time.sleep(0.07)
                 right_deg(theta_actual_change)
-                time.sleep(1)
+                time.sleep(0.07)
                 update_pos(-theta_change,0,0)
-                time.sleep(1)
+                time.sleep(0.07)
             else:
                 print("detect")
                 left_deg(55)
                 update_pos(45,0,0)
-                time.sleep(0.5)
+                time.sleep(0.07)
             servo(0)
 
 def plot_path():
@@ -281,15 +293,7 @@ def plot_path():
     plt.ylim((-20, max(X_Goal, Y_Goal) + 20 ))
 
 
-def bug2():
-    onGoal = False
-    onMLine = False
-
-    servo(90)
-    set_speed(100)
-    scale = 1.2
-
-    #Let the robot turn to the direction of the final goal
+def orient_to_goal():
     if X_Goal != 0 and Y_Goal > 0:
         print '(Y_Goal/ X_Goal) / 3.14 * 180',np.arctan((Y_Goal/ X_Goal) / 3.14 * 180)
         left_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
@@ -308,6 +312,17 @@ def bug2():
         update_pos(90,0,0)
 
 
+def bug2():
+    onGoal = False
+    onMLine = False
+
+    servo(90)
+    set_speed(100)
+    scale = 1.2
+
+    #Let the robot turn to the direction of the final goal
+    orient_to_goal()
+
     if isGoal(X_Goal, Y_Goal, X, Y):
         plot_path()
         return True
@@ -316,10 +331,6 @@ def bug2():
             fwd_cm(3)
             onGoal, onMLine = posFeedback(0, 3, 0)
 
-            if len(MLINE_X) == 0 or \
-                (len(MLINE_X) > 0 and ((X_Goal - X) ** 2 + (Y_Goal - Y) ** 2) < ((X_Goal - MLINE_X[-1])**2 + (Y_Goal - MLINE_Y[-1])**2)):
-                MLINE_X.append(X)
-                MLINE_Y.append(Y)
 
             if onGoal:
                 plot_path()
