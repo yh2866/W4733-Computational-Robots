@@ -25,11 +25,11 @@ Previous_Matrix = [[1, 0, 0],
                    [0, 1, 0],
                    [0, 0, 1]]
 
-BlOCKED_MLINE_X = []
+BLOCKED_MLINE_X = []
 BLOCKED_MLINE_Y = []
 
 UNBLOCKED_MLINE_X = []
-UNBLOCKED_MLINE_X = []
+UNBLOCKED_MLINE_Y = []
 SECONDVISITMLINE = -1
 
 def left_deg(deg=None):
@@ -58,7 +58,7 @@ def right_deg(deg=None):
     right()
 
 
-def detect(dist):
+def detect(d1, d2):
     SAMPLE = 6
     REQUIRED = 3
 
@@ -67,8 +67,8 @@ def detect(dist):
         time.sleep(0.07)
 
         d = us_dist(15)
-        print(d)
-        if d <= dist and d > 0:
+        # print(d)
+        if d <= d1 and d > d2:
             sampling.append(d)
 
     if len(sampling) >= REQUIRED:
@@ -178,9 +178,13 @@ def avoidObject():
         for i in range(len(BLOCKED_MLINE_X)):
             if abs(BLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(BLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
                 print("No solution")
+                stop()
+                time.sleep(1)
                 return
 
-
+    print("h m line value push")
+    print("X ", X)
+    print("Y ", Y)
     BLOCKED_MLINE_X.append(X)
     BLOCKED_MLINE_Y.append(Y)
 
@@ -197,57 +201,72 @@ def avoidObject():
 
         while True:
             # check object next to gopigo
-            while detect(20) and not detect(10):
+            while detect(20, 10):
                 # check front too
                 servo(90)
                 time.sleep(0.07)
                 # no object front, but we have an object next. so we move forward
-                if not detect(20):
+                if not detect(20, 0):
                     OBSTACLE_X.append(X)
                     OBSTACLE_Y.append(Y - 20)
-                    fwd(4)
-                    obstacle_move += 4
-                    onGoal, onMLine = posFeedback(0, 4, 0)
+                    fwd_cm(3)
+                    obstacle_move += 3
+                    onGoal, onMLine = posFeedback(0, 3, 0)
 
                     secondVisitMLine = False
 
                     if onGoal:
                         return
 
-                    elif onMLine:
-                        print("l mline")
-                        if len(UNBLOCKED_MLINE_X) > 0:
-                            for i in range(len(BLOCKED_MLINE_X)):
-                                if abs(UNBLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
-                                    print("second visit m line. just move forward.")
-                                    secondVisitMLine = True
+                    elif onMLine and obstacle_move > 10: 
+                        print("check h or l mline") 
 
-                        if not secondVisitMLine:
-                            if ((X_Goal - X) ** 2 + (Y_Goal - Y) ** 2) < \
-                            ((X_Goal - UNBLOCKED_MLINE_X[-1])**2 + (Y_Goal - UNBLOCKED_MLINE_X[-1])**2)):
-                                UNBLOCKED_MLINE_X.append(X)
-                                UNBLOCKED_MLINE_Y.append(Y)
+                        if theta >= 0:
+                            print(" h m line")
 
-                                print("MLINE VALUE PUSH")
-                                print("X ", X)
-                                print("Y ", Y)
-                                print("--------------")
+                            if len(BLOCKED_MLINE_X) > 0 and onMLine:
+                                print("h mline")
+                                for i in range(len(BLOCKED_MLINE_X)):
+                                    if abs(BLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(BLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
+                                        print("No solution 2!!!")
+                                        stop()
+                                        time.sleep(1)
+                                        return
+                                
+                            print("on m line, but got farther. Ignore")
 
-                                rot_angle = -theta
+                        else:
+                            print("l m line")
+                            
+                            if len(UNBLOCKED_MLINE_X) > 0:
+                                for i in range(len(BLOCKED_MLINE_X)):
+                                    if abs(UNBLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
+                                        print("second visit m line. just move forward.")
+                                        secondVisitMLine = True
 
-                                if rot_angle < 0:
-                                    right_deg(abs(rot_angle)*scale)
-                                    update_pos(rot_angle, 0, 0)
-                                else:
-                                    left_deg(abs(rot_angle)*scale)
-                                    update_pos(rot_angle, 0, 0)
+                            if not secondVisitMLine:
+                                if (X_Goal**2 + Y_Goal**2) > ((X_Goal - X)**2 + (Y_Goal - Y)**2):
+                                    UNBLOCKED_MLINE_X.append(X)
+                                    UNBLOCKED_MLINE_Y.append(Y)
 
-                                servo(90)
+                                    print("MLINE VALUE PUSH")
+                                    print("X ", X)
+                                    print("Y ", Y)
+                                    print("--------------")
 
-                                if(bug2()):
-                                    return
-                            else:
-                                print("on m line, but got farther. Ignore")
+                                    rot_angle = -theta
+
+                                    if rot_angle < 0:
+                                        right_deg(abs(rot_angle)*scale)
+                                        update_pos(rot_angle, 0, 0)
+                                    else:
+                                        left_deg(abs(rot_angle)*scale)
+                                        update_pos(rot_angle, 0, 0)
+
+                                    servo(90)
+
+                                    if(bug2()):
+                                        return
 
 
                 # object to the front and also object next to gopigo. Avoid it
@@ -267,7 +286,7 @@ def avoidObject():
             servo(0)
             time.sleep(0.07)
 
-            if not detect(20):
+            if not detect(20, 0):
                 break
             else:
                 left_deg(26)
@@ -280,10 +299,10 @@ def avoidObject():
         theta_actual_change = 26
 
         # object next to gopigo too far away. Need to get closer to it.
-        while not detect(20):
+        while not detect(20, 0):
             servo(90)
 
-            if not detect(20):
+            if not detect(20, 0):
                 print("not detect")
                 time.sleep(0.1)
                 right_deg(theta_actual_change)
@@ -339,15 +358,15 @@ def bug2():
     orient_to_goal()
 
     if isGoal(X_Goal, Y_Goal, X, Y):
-        plot_path()
+        # plot_path()
         return True
     else:
-        while not detect(20):
-            fwd_cm(4)
-            onGoal, onMLine = posFeedback(0, 4, 0)
+        while not detect(20, 0):
+            fwd_cm(3)
+            onGoal, onMLine = posFeedback(0, 3, 0)
 
             if onGoal:
-                plot_path()
+                # plot_path()
                 return True
 
     avoidObject()
@@ -359,5 +378,7 @@ def bug2():
 if __name__ == '__main__':
     #Run bug2 algorithm
     bug2()
+    plot_path()
+    
     #Save trajectory picture
     plt.savefig("result.png")
