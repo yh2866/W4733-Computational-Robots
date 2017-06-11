@@ -14,7 +14,7 @@ Y = 0.0
 X_Goal = 200.0
 Y_Goal = 0.0
 theta = 0
-ERROR_mline = 4
+ERROR_mline = 3
 ERROR_goal = 3
 Plot_X = []
 Plot_Y = []
@@ -27,6 +27,7 @@ Previous_Matrix = [[1, 0, 0],
 
 MLINE_X = []
 MLINE_Y = []
+SECONDVISITMLINE = -1
 
 def left_deg(deg=None):
     '''
@@ -202,26 +203,25 @@ def avoidObject():
                     onMLine = False
                     onGoal = False
 
-                secondVisitMLine = False
-
                 servo(0)
 
                 if onGoal:
                     return
 
-                # check if we've been on this mline
-                elif onMLine and len(MLINE_X) > 0:
-                   for i in range(len(MLINE_X)):
-                      if MLINE_X[i] - X <= ERROR_mline and MLINE_Y[i] - Y <= ERROR_mline:
-                        print("second visit m-line!")
-                        secondVisitMLine = True
 
-
-                elif onMLine and obstacle_move > 10:
+                elif onMLine:
                     print("On M Line !!! ")
 
+                    # check if we've been on this mline
+                    if len(MLINE_X) > 0:
+                      if MLINE_X[-1] - X <= ERROR_mline and MLINE_Y[-1] - Y <= ERROR_mline:
+                        if SECONDVISITMLINE == len(MLINE_X):
+                            print("no solution")
+                        else:
+                            SECONDVISITMLINE == len(MLINE_X)
 
-                    if len(MLINE_X) == 0 or \
+
+                    elif len(MLINE_X) == 0 or \
                        (len(MLINE_X) > 0 and ((X_Goal - X) ** 2 + (Y_Goal - Y) ** 2) < ((X_Goal - MLINE_X[-1])**2 + (Y_Goal - MLINE_Y[-1])**2)):
                         MLINE_X.append(X)
                         MLINE_Y.append(Y)
@@ -246,6 +246,7 @@ def avoidObject():
                             return
 
             servo(0)
+            time.sleep(0.07)
 
             if not detect(20):
                 break
@@ -325,7 +326,6 @@ def bug2():
         while not detect(20):
             fwd_cm(4)
             onGoal, onMLine = posFeedback(0, 4, 0)
-
 
             if onGoal:
                 plot_path()
