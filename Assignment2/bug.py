@@ -55,12 +55,12 @@ def right_deg(deg=None):
 
 
 def detect(dist):
-    SAMPLE = 5
+    SAMPLE = 6
     REQUIRED = 3
 
     sampling = []
     for j in range(SAMPLE):
-        time.sleep(0.07)
+        time.sleep(0.2)
 
         d = us_dist(15)
         print(d)
@@ -133,7 +133,7 @@ def posFeedback(theta_change, X_change, Y_change):
     onMLine = False
 
     update_pos(theta_change, X_change, Y_change)
-    time.sleep(0.07)
+    time.sleep(0.1)
 
     if isGoal(X_Goal, Y_Goal, X, Y):
         onGoal = True
@@ -169,9 +169,9 @@ def on_Mline(x_goal, y_goal, x, y):
 def avoidObject():
     obstacle_move = 0
     left_deg(55)
-    time.sleep(0.07)
+    time.sleep(0.2)
     update_pos(45,0,0)
-    time.sleep(0.07)
+    time.sleep(0.2)
     scale = 1.2
 
     onGoal = False
@@ -203,7 +203,7 @@ def avoidObject():
                     OBSTACLE_Y.append(Y)
                     left_deg(55)
                     update_pos(45,0,0)
-                    time.sleep(0.07)
+                    time.sleep(0.2)
                     onMLine = False
                     onGoal = False
 
@@ -215,7 +215,7 @@ def avoidObject():
 
                 # check if we've been on this mline
                 elif onMLine and len(MLINE_X) > 0:
-                   for i in range(MLINE_X):
+                   for i in range(len(MLINE_X)):
                       if MLINE_X[i] - X <= ERROR_mline and MLINE_Y[i] - Y <= ERROR_mline:
                         print("second visit m-line!")
                         secondVisitMLine = True
@@ -269,16 +269,16 @@ def avoidObject():
 
             if not detect(20):
                 print("not detect")
-                time.sleep(0.07)
+                time.sleep(0.1)
                 right_deg(theta_actual_change)
-                time.sleep(0.07)
+                time.sleep(0.1)
                 update_pos(-theta_change,0,0)
-                time.sleep(0.07)
+                time.sleep(0.1)
             else:
                 print("detect")
                 left_deg(55)
                 update_pos(45,0,0)
-                time.sleep(0.07)
+                time.sleep(0.1)
             servo(0)
 
 def plot_path():
