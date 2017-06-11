@@ -11,7 +11,7 @@ CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
 X = 0.0
 Y = 0.0
-X_Goal = 200.0
+X_Goal = 300.0
 Y_Goal = 0.0
 theta = 0
 ERROR_mline = 4
@@ -59,8 +59,8 @@ def right_deg(deg=None):
 
 
 def detect(d1, d2):
-    SAMPLE = 6
-    REQUIRED = 3
+    SAMPLE = 5
+    REQUIRED = 2
 
     sampling = []
     for j in range(SAMPLE):
@@ -180,7 +180,7 @@ def avoidObject():
                 print("No solution")
                 stop()
                 time.sleep(1)
-                return
+                return True
 
     print("h m line value push")
     print("X ", X)
@@ -193,7 +193,7 @@ def avoidObject():
     left_deg(55)
     update_pos(45,0,0)
     time.sleep(0.1)
-    scale = 1.2
+    scale = 1.3
 
     servo(0)
 
@@ -207,8 +207,14 @@ def avoidObject():
                 time.sleep(0.07)
                 # no object front, but we have an object next. so we move forward
                 if not detect(20, 0):
+                    
                     OBSTACLE_X.append(X)
-                    OBSTACLE_Y.append(Y - 20)
+                    
+                    if theta >= 0:
+                        OBSTACLE_Y.append(Y - 20)
+                    else:
+                        OBSTACLE_Y.append(Y + 20)
+                        
                     fwd_cm(3)
                     obstacle_move += 3
                     onGoal, onMLine = posFeedback(0, 3, 0)
@@ -216,7 +222,7 @@ def avoidObject():
                     secondVisitMLine = False
 
                     if onGoal:
-                        return
+                        return True
 
                     elif onMLine and obstacle_move > 10: 
                         print("check h or l mline") 
@@ -231,7 +237,7 @@ def avoidObject():
                                         print("No solution 2!!!")
                                         stop()
                                         time.sleep(1)
-                                        return
+                                        return True
                                 
                             print("on m line, but got farther. Ignore")
 
@@ -271,11 +277,15 @@ def avoidObject():
 
                 # object to the front and also object next to gopigo. Avoid it
                 else:
-                    OBSTACLE_X.append(X + 20)
+                    if theta >= 0:
+                        OBSTACLE_X.append(X + 20)
+                    else:
+                        OBSTACLE_X.append(X - 20)
+                        
                     OBSTACLE_Y.append(Y)
                     left_deg(55)
                     update_pos(45,0,0)
-                    time.sleep(0.1)
+                    time.sleep(0.2)
                     onMLine = False
                     onGoal = False
 
@@ -286,7 +296,7 @@ def avoidObject():
             servo(0)
             time.sleep(0.07)
 
-            if not detect(20, 0):
+            if not detect(20, 10):
                 break
             else:
                 left_deg(26)
@@ -319,12 +329,14 @@ def plot_path():
     print 'Plot_x', Plot_X
     print 'Plot_y', Plot_Y
     plt.plot(Plot_X[0], Plot_Y[0], 'go')
-    plt.plot(Plot_X[1:-2],Plot_Y[1:-2],'bo')
+    plt.plot(Plot_X[1:-2],Plot_Y[1:-2],'bo', )
     plt.plot(Plot_X[-1], Plot_Y[-1], 'ro')
     plt.plot(Plot_X,Plot_Y,'b')
-    plt.plot(OBSTACLE_X, OBSTACLE_Y, 'rx')
-    plt.xlim((-20, max(X_Goal, Y_Goal) + 20 ))
-    plt.ylim((-20, max(X_Goal, Y_Goal) + 20 ))
+    #plt.plot(OBSTACLE_X, OBSTACLE_Y, 'rx')
+    #plt.xlim((-20, max(X_Goal, Y_Goal) + 20 ))
+    plt.xlim((-40, 40 + 20 ))
+    #plt.ylim((-20, max(X_Goal, Y_Goal) + 20 ))
+    plt.ylim((-40, 40 + 20 ))
 
 
 def orient_to_goal():
