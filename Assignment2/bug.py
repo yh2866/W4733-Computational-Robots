@@ -209,7 +209,7 @@ def avoidObject():
                     return
 
 
-                elif onMLine:
+                elif onMLine and obstacle_move > 12:
                     print("On M Line !!! ")
 
                     # check if we've been on this mline
