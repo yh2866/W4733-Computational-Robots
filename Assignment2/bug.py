@@ -55,8 +55,8 @@ def right_deg(deg=None):
 
 
 def detect(dist):
-    SAMPLE = 4
-    REQUIRED = 2
+    SAMPLE = 6
+    REQUIRED = 3
 
     sampling = []
     for j in range(SAMPLE):
@@ -169,7 +169,6 @@ def on_Mline(x_goal, y_goal, x, y):
 def avoidObject():
     obstacle_move = 0
     left_deg(55)
-    time.sleep(0.2)
     update_pos(45,0,0)
     time.sleep(0.2)
     scale = 1.2
@@ -187,12 +186,11 @@ def avoidObject():
             while detect(20) and not detect(10):
                 # check front too
                 servo(90)
-
+                time.sleep(0.07)
                 # no object front, but we have an object next. so we move forward
                 if not detect(20):
                     OBSTACLE_X.append(X)
                     OBSTACLE_Y.append(Y - 20)
-                    fwd_cm(4)
                     obstacle_move += 4
                     onGoal, onMLine = posFeedback(0, 4, 0)
 
@@ -202,7 +200,7 @@ def avoidObject():
                     OBSTACLE_Y.append(Y)
                     left_deg(55)
                     update_pos(45,0,0)
-                    time.sleep(0.2)
+                    time.sleep(0.1)
                     onMLine = False
                     onGoal = False
 
