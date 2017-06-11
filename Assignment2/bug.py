@@ -133,7 +133,6 @@ def posFeedback(theta_change, X_change, Y_change):
     onMLine = False
 
     update_pos(theta_change, X_change, Y_change)
-    time.sleep(0.1)
 
     if isGoal(X_Goal, Y_Goal, X, Y):
         onGoal = True
@@ -170,18 +169,16 @@ def avoidObject():
     obstacle_move = 0
     left_deg(55)
     update_pos(45,0,0)
-    time.sleep(0.2)
+    time.sleep(0.1)
     scale = 1.2
 
     onGoal = False
     onMLine = False
+    servo(0)
 
     while True:
 
         while True:
-            # move forward
-            servo(0)
-
             # check object next to gopigo
             while detect(20) and not detect(10):
                 # check front too
@@ -191,6 +188,7 @@ def avoidObject():
                 if not detect(20):
                     OBSTACLE_X.append(X)
                     OBSTACLE_Y.append(Y - 20)
+                    fwd(4)
                     obstacle_move += 4
                     onGoal, onMLine = posFeedback(0, 4, 0)
 
@@ -206,6 +204,7 @@ def avoidObject():
 
                 secondVisitMLine = False
 
+                servo(0)
 
                 if onGoal:
                     return
