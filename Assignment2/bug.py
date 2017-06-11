@@ -182,17 +182,16 @@ def avoidObject():
                 time.sleep(1)
                 return True
 
-    print("h m line value push")
+    print("h mline value push")
     print("X ", X)
     print("Y ", Y)
     BLOCKED_MLINE_X.append(X)
     BLOCKED_MLINE_Y.append(Y)
 
-
     obstacle_move = 0
     left_deg(55)
     update_pos(45,0,0)
-    time.sleep(0.1)
+    time.sleep(1)
     scale = 1.3
 
     servo(0)
@@ -204,17 +203,17 @@ def avoidObject():
             while detect(20, 10):
                 # check front too
                 servo(90)
-                time.sleep(0.07)
+                time.sleep(0.3)
                 # no object front, but we have an object next. so we move forward
                 if not detect(20, 0):
-                    
+
                     OBSTACLE_X.append(X)
-                    
+
                     if theta >= 0:
                         OBSTACLE_Y.append(Y - 20)
                     else:
                         OBSTACLE_Y.append(Y + 20)
-                        
+
                     fwd_cm(3)
                     obstacle_move += 3
                     onGoal, onMLine = posFeedback(0, 3, 0)
@@ -224,8 +223,8 @@ def avoidObject():
                     if onGoal:
                         return True
 
-                    elif onMLine and obstacle_move > 10: 
-                        print("check h or l mline") 
+                    elif onMLine and obstacle_move > 10:
+                        print("check h or l mline")
 
                         if theta >= 0:
                             print(" h m line")
@@ -238,12 +237,12 @@ def avoidObject():
                                         stop()
                                         time.sleep(1)
                                         return True
-                                
+
                             print("on m line, but got farther. Ignore")
 
                         else:
                             print("l m line")
-                            
+
                             if len(UNBLOCKED_MLINE_X) > 0:
                                 for i in range(len(BLOCKED_MLINE_X)):
                                     if abs(UNBLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
@@ -270,6 +269,7 @@ def avoidObject():
                                         update_pos(rot_angle, 0, 0)
 
                                     servo(90)
+                                    time.sleep(1)
 
                                     if(bug2()):
                                         return
@@ -281,11 +281,11 @@ def avoidObject():
                         OBSTACLE_X.append(X + 20)
                     else:
                         OBSTACLE_X.append(X - 20)
-                        
+
                     OBSTACLE_Y.append(Y)
-                    left_deg(55)
+                    left_deg(60)
                     update_pos(45,0,0)
-                    time.sleep(0.2)
+                    time.sleep(1)
                     onMLine = False
                     onGoal = False
 
@@ -294,13 +294,14 @@ def avoidObject():
 
 
             servo(0)
-            time.sleep(0.07)
+            time.sleep(0.3)
 
-            if not detect(20, 10):
-                break
-            else:
+            if detect(10, 0):
                 left_deg(26)
                 update_pos(20, 0, 0)
+                time.sleep(0.5)
+            else:
+                break
 
 
         servo(0)
@@ -314,15 +315,14 @@ def avoidObject():
 
             if not detect(20, 0):
                 print("not detect")
-                time.sleep(0.1)
                 right_deg(theta_actual_change)
                 update_pos(-theta_change,0,0)
-                time.sleep(0.1)
+                time.sleep(1)
             else:
                 print("detect")
                 left_deg(55)
                 update_pos(45,0,0)
-                time.sleep(0.1)
+                time.sleep(1)
             servo(0)
 
 def plot_path():
@@ -391,6 +391,6 @@ if __name__ == '__main__':
     #Run bug2 algorithm
     bug2()
     plot_path()
-    
+
     #Save trajectory picture
     plt.savefig("result.png")
