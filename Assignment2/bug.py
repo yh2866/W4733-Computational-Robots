@@ -17,11 +17,11 @@ X_Goal = 300.0
 Y_Goal = 0.0
 theta = 0
 
-theta_change = 20
-theta_actual_change = 27
+theta_change = 30
+theta_actual_change = 39
 
 ERROR_mline = 4
-ERROR_goal = 8
+ERROR_goal = 30
 
 
 Plot_X = []
@@ -201,29 +201,28 @@ def avoidObject():
     while detect(20, 0):
         left_deg(54)
         update_pos(45,0,0)
-        time.sleep(3)
+        time.sleep(1)
 
     scale = 1.1
     servo(0)
+    time.sleep(1)
 
     while True:
 
 
         while True:
             # check object next to gopigo
+            
             while detect(20, 10):
                 # check front too
                 servo(90)
-                time.sleep(0.3)
+                time.sleep(0.5)
                 # no object front, but we have an object next. so we move forward
                 if not detect(20, 0):
 
                     OBSTACLE_X.append(X)
-
-                    if theta >= 0:
-                        OBSTACLE_Y.append(Y - 20)
-                    else:
-                        OBSTACLE_Y.append(Y + 20)
+                    OBSTACLE_Y.append(Y - 20)
+                    
 
                     fwd_cm(3)
                     obstacle_move += 3
@@ -256,9 +255,13 @@ def avoidObject():
 
                             if len(UNBLOCKED_MLINE_X) > 0:
                                 for i in range(len(UNBLOCKED_MLINE_X)):
-                                    if abs(UNBLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
-                                        print("second visit m line. just move forward.")
-                                        secondVisitMLine = True
+                                     if abs(UNBLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
+                                     #if abs(UNBLOCKED_MLINE_X[i] - X) <= 30 and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
+                                        print("second visit m line. just move forward.")  
+                                        #plot_path()
+                                        #time.sleep(1)
+                                        #plt.savefig("result.png")
+                                        #time.sleep(3)
 
                             if not secondVisitMLine:
                                 if (X_Goal**2 + Y_Goal**2) > ((X_Goal - X)**2 + (Y_Goal - Y)**2):
@@ -279,25 +282,23 @@ def avoidObject():
                                         left_deg(abs(rot_angle)*scale)
                                         update_pos(rot_angle, 0, 0)
 
-                                    time.sleep(2)
+                                    time.sleep(0.5)
                                     servo(90)
+                                    time.sleep(0.5)
 
 
                                     if(bug2()):
-                                        return
+                                        return True
 
 
                 # object to the front and also object next to gopigo. Avoid it
                 else:
-                    if theta >= 0:
-                        OBSTACLE_X.append(X + 20)
-                    else:
-                        OBSTACLE_X.append(X - 20)
-
+                    
+                    OBSTACLE_X.append(X + 20)
                     OBSTACLE_Y.append(Y)
                     left_deg(54)
                     update_pos(45,0,0)
-                    time.sleep(3)
+                    time.sleep(1)
                     onMLine = False
                     onGoal = False
 
@@ -306,33 +307,36 @@ def avoidObject():
 
 
             servo(0)
-            time.sleep(0.3)
+            time.sleep(1)
 
             if detect(10, 0):
                 left_deg(theta_actual_change)
                 update_pos(theta_change, 0, 0)
-                time.sleep(3)
+                time.sleep(1)
             else:
                 break
 
 
         servo(0)
+        time.sleep(1)
 
         # object next to gopigo too far away. Need to get closer to it.
         while not detect(20, 0):
             servo(90)
+            time.sleep(1)
 
             if not detect(20, 0):
                 print("not detect")
                 right_deg(theta_actual_change)
                 update_pos(-theta_change,0,0)
-                time.sleep(3)
+                time.sleep(1)
             else:
                 print("detect")
                 left_deg(54)
                 update_pos(45,0,0)
-                time.sleep(3)
+                time.sleep(1)
             servo(0)
+            time.sleep(1)
 
 def plot_path():
     print 'Plot_x', Plot_X
