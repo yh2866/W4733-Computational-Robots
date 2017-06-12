@@ -281,7 +281,7 @@ def avoidObject():
 
                                     time.sleep(2)
                                     servo(90)
-                                    
+
 
                                     if(bug2()):
                                         return
