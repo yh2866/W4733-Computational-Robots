@@ -121,7 +121,9 @@ def update_pos(theta_change, X_change, Y_change):
     global Y
     global theta
     global Previous_Matrix
-
+    global OBSTACLE_X
+    global OBSTACLE_Y
+    
     Previous_Matrix = np.dot(Previous_Matrix,transform_matrix(theta_change,X_change,Y_change))
     Current_Pos = np.dot(Previous_Matrix,Original_Pos)
     Currrent_Pos_Obstacle = np.dot(Previous_Matrix, [[OBSTACLE_X], [OBSTACLE_Y], [1]])
