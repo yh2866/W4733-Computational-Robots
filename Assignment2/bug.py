@@ -17,6 +17,10 @@ X_Goal = 300.0
 Y_Goal = 0.0
 theta = 0
 
+OBSTACLE_X = -1
+OBSTACLE_Y = -1
+
+
 theta_change = 30
 theta_actual_change = 39
 
@@ -24,10 +28,10 @@ ERROR_mline = 4
 ERROR_goal = 5
 
 
-Plot_X = []
-Plot_Y = []
-OBSTACLE_X = []
-OBSTACLE_Y = []
+PLOT_X_LIST = []
+PLOT_Y_LIST = []
+OBSTACLE_X_LIST = []
+OBSTACLE_Y_LIST = []
 Original_Pos = [[0],[0],[1]]
 Previous_Matrix = [[1, 0, 0],
                    [0, 1, 0],
@@ -120,15 +124,20 @@ def update_pos(theta_change, X_change, Y_change):
 
     Previous_Matrix = np.dot(Previous_Matrix,transform_matrix(theta_change,X_change,Y_change))
     Current_Pos = np.dot(Previous_Matrix,Original_Pos)
+    Currrent_Pos_Obstacle = np.dot(Previous_Matrix, [[OBSTACLE_X], [OBSTACLE_Y], [1]])
     X = Current_Pos[0]
     Y = Current_Pos[1]
+
+    OBSTACLE_X = Currrent_Pos_Obstacle[0]
+    OBSTACLE_Y = Currrent_Pos_Obstacle[1]
+
     theta += theta_change
     if theta > 180:
         theta -= 360
     if theta < -180:
         theta += 360
-    Plot_X.append(X)
-    Plot_Y.append(Y)
+    PLOT_X_LIST.append(X)
+    PLOT_Y_LIST.append(Y)
     if en_debug:
         print "theta", theta
         print "X", X
@@ -220,8 +229,14 @@ def avoidObject():
                 # no object front, but we have an object next. so we move forward
                 if not detect(20, 0):
 
-                    OBSTACLE_X.append(X)
-                    OBSTACLE_Y.append(Y - 20)
+                    OBSTACLE_X = 0
+                    OBSTACLE_Y = -20
+
+                    # using this to update obstacle location
+                    update_pos(0, 0, 0)
+
+                    OBSTACLE_X_LIST.append(OBSTACLE_X)
+                    OBSTACLE_Y_LIST.append(OBSTACLE_Y)
 
 
                     fwd_cm(3)
@@ -294,8 +309,15 @@ def avoidObject():
                 # object to the front and also object next to gopigo. Avoid it
                 else:
 
-                    OBSTACLE_X.append(X + 20)
-                    OBSTACLE_Y.append(Y)
+                    OBSTACLE_X = 20
+                    OBSTACLE_Y = 0
+
+                    # using this to update obstacle location
+                    update_pos(0, 0, 0)
+
+                    OBSTACLE_X_LIST.append(OBSTACLE_X)
+                    OBSTACLE_Y_LIST.append(OBSTACLE_Y)
+
                     left_deg(54)
                     update_pos(45,0,0)
                     time.sleep(1)
@@ -339,13 +361,13 @@ def avoidObject():
             time.sleep(1)
 
 def plot_path():
-    print 'Plot_x', Plot_X
-    print 'Plot_y', Plot_Y
-    plt.plot(Plot_X[0], Plot_Y[0], 'go')
-    plt.plot(Plot_X[1:-2],Plot_Y[1:-2],'bo', )
-    plt.plot(Plot_X[-1], Plot_Y[-1], 'ro')
-    plt.plot(Plot_X,Plot_Y,'b')
-    plt.plot(OBSTACLE_X, OBSTACLE_Y, 'rx')
+    print 'PLOT_X_LIST', PLOT_X_LIST
+    print 'PLOT_Y_LIST', PLOT_Y_LIST
+    plt.plot(PLOT_X_LIST[0], PLOT_Y_LIST[0], 'go')
+    plt.plot(PLOT_X_LIST[1:-2],PLOT_Y_LIST[1:-2],'bo', )
+    plt.plot(PLOT_X_LIST[-1], PLOT_Y_LIST[-1], 'ro')
+    plt.plot(PLOT_X_LIST,PLOT_Y_LIST,'b')
+    plt.plot(OBSTACLE_X_LIST, OBSTACLE_Y_LIST, 'rx')
     plt.xlim((-20, max(X_Goal, Y_Goal) + 20 ))
     plt.ylim((-20, max(X_Goal, Y_Goal) + 20 ))
 
