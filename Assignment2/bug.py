@@ -14,8 +14,14 @@ Y = 0.0
 X_Goal = 300.0
 Y_Goal = 0.0
 theta = 0
+
+theta_change = 20
+theta_actual_change = 27
+
 ERROR_mline = 4
-ERROR_goal = 3
+ERROR_goal = 8
+
+
 Plot_X = []
 Plot_Y = []
 OBSTACLE_X = []
@@ -189,14 +195,17 @@ def avoidObject():
     BLOCKED_MLINE_Y.append(Y)
 
     obstacle_move = 0
-    left_deg(55)
-    update_pos(45,0,0)
-    time.sleep(1)
-    scale = 1.3
 
+    while detect(20, 0):
+        left_deg(54)
+        update_pos(45,0,0)
+        time.sleep(3)
+
+    scale = 1.1
     servo(0)
 
     while True:
+
 
         while True:
             # check object next to gopigo
@@ -244,7 +253,7 @@ def avoidObject():
                             print("l m line")
 
                             if len(UNBLOCKED_MLINE_X) > 0:
-                                for i in range(len(BLOCKED_MLINE_X)):
+                                for i in range(len(UNBLOCKED_MLINE_X)):
                                     if abs(UNBLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
                                         print("second visit m line. just move forward.")
                                         secondVisitMLine = True
@@ -268,8 +277,9 @@ def avoidObject():
                                         left_deg(abs(rot_angle)*scale)
                                         update_pos(rot_angle, 0, 0)
 
+                                    time.sleep(2)
                                     servo(90)
-                                    time.sleep(1)
+                                    
 
                                     if(bug2()):
                                         return
@@ -283,9 +293,9 @@ def avoidObject():
                         OBSTACLE_X.append(X - 20)
 
                     OBSTACLE_Y.append(Y)
-                    left_deg(60)
+                    left_deg(54)
                     update_pos(45,0,0)
-                    time.sleep(1)
+                    time.sleep(3)
                     onMLine = False
                     onGoal = False
 
@@ -297,17 +307,14 @@ def avoidObject():
             time.sleep(0.3)
 
             if detect(10, 0):
-                left_deg(26)
-                update_pos(20, 0, 0)
-                time.sleep(0.5)
+                left_deg(theta_actual_change)
+                update_pos(theta_change, 0, 0)
+                time.sleep(3)
             else:
                 break
 
 
         servo(0)
-
-        theta_change = 20
-        theta_actual_change = 26
 
         # object next to gopigo too far away. Need to get closer to it.
         while not detect(20, 0):
@@ -317,12 +324,12 @@ def avoidObject():
                 print("not detect")
                 right_deg(theta_actual_change)
                 update_pos(-theta_change,0,0)
-                time.sleep(1)
+                time.sleep(3)
             else:
                 print("detect")
-                left_deg(55)
+                left_deg(54)
                 update_pos(45,0,0)
-                time.sleep(1)
+                time.sleep(3)
             servo(0)
 
 def plot_path():
