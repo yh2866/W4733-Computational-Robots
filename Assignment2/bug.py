@@ -21,7 +21,7 @@ theta_change = 30
 theta_actual_change = 39
 
 ERROR_mline = 4
-ERROR_goal = 30
+ERROR_goal = 5
 
 
 Plot_X = []
