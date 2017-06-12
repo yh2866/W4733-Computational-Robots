@@ -13,7 +13,7 @@ CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
 X = 0.0
 Y = 0.0
-X_Goal = 100.0
+X_Goal = 300.0
 Y_Goal = 0.0
 theta = 0
 
@@ -22,10 +22,10 @@ OBSTACLE_Y = -1
 
 
 theta_change = 30
-theta_actual_change = 39
+theta_actual_change = 36
 
 ERROR_mline = 4
-ERROR_goal = 5
+ERROR_goal = 20
 
 
 PLOT_X_LIST = []
@@ -116,7 +116,7 @@ def transform_matrix(rotate_angle, x_move, y_move):
     return T
 
 
-def update_pos(theta_change, X_change, Y_change, obstacle_theta):
+def update_pos(theta_change, X_change, Y_change):
     global X
     global Y
     global theta
@@ -124,20 +124,20 @@ def update_pos(theta_change, X_change, Y_change, obstacle_theta):
     global OBSTACLE_X
     global OBSTACLE_Y
 
+    Currrent_Pos_Temp = np.dot(Previous_Matrix, transform_matrix(-90,0,0))
+    Currrent_Pos_Temp = np.dot(Currrent_Pos_Temp, transform_matrix( 0 ,10,0))
+    Currrent_Pos_Obstacle = np.dot(Currrent_Pos_Temp, Original_Pos)
+
     Previous_Matrix = np.dot(Previous_Matrix,transform_matrix(theta_change,X_change,Y_change))
     Current_Pos = np.dot(Previous_Matrix,Original_Pos)
-    Currrent_Pos_Obstacle = np.dot(np.dot(Previous_Matrix, transform_matrix(0,OBSTACLE_X,OBSTACLE_Y)), Original_Pos)
+    
+
+    
     X = Current_Pos[0]
     Y = Current_Pos[1]
 
     OBSTACLE_X = Currrent_Pos_Obstacle[0]
     OBSTACLE_Y = Currrent_Pos_Obstacle[1]
-
-    print("updated")
-    print("X ", X)
-    print("Y ", Y)
-    print("OBSTACLE_X ", OBSTACLE_X)
-    print("OBSTACLE_Y ", OBSTACLE_Y)
 
 
     theta += theta_change
@@ -217,7 +217,7 @@ def avoidObject():
     obstacle_move = 0
 
     while detect(20, 0):
-        left_deg(54)
+        left_deg(55)
         update_pos(45,0,0)
         time.sleep(1)
 
@@ -238,8 +238,8 @@ def avoidObject():
                 # no object front, but we have an object next. so we move forward
                 if not detect(20, 0):
 
-                    OBSTACLE_X = 0
-                    OBSTACLE_Y = -20
+                    #OBSTACLE_X = 0
+                    #OBSTACLE_Y = -20
 
                     update_pos(0, 0, 0)
 
@@ -318,15 +318,21 @@ def avoidObject():
                 # object to the front and also object next to gopigo. Avoid it
                 else:
 
-                    OBSTACLE_X = 20
-                    OBSTACLE_Y = 0
+                    #OBSTACLE_X = 20
+                    #OBSTACLE_Y = 0
 
                     update_pos(0, 0, 0)
 
                     OBSTACLE_X_LIST.append(OBSTACLE_X)
                     OBSTACLE_Y_LIST.append(OBSTACLE_Y)
 
-                    left_deg(54)
+                    print("updated")
+                    print("X ", X)
+                    print("Y ", Y)
+                    print("OBSTACLE_X ", OBSTACLE_X)
+                    print("OBSTACLE_Y ", OBSTACLE_Y)
+
+                    left_deg(55)
                     update_pos(45,0,0)
 
                     time.sleep(1)
@@ -363,7 +369,7 @@ def avoidObject():
                 time.sleep(1)
             else:
                 print("detect")
-                left_deg(54)
+                left_deg(55)
                 update_pos(45,0,0)
                 time.sleep(1)
             servo(0)
@@ -427,6 +433,18 @@ def bug2():
                 plt.savefig("result.png")
                 stop()
                 return True
+
+
+    OBSTACLE_X = 20
+    OBSTACLE_Y = 0
+
+    update_pos(0, 0, 0)
+
+    print("updated")
+    print("X ", X)
+    print("Y ", Y)
+    print("OBSTACLE_X ", OBSTACLE_X)
+    print("OBSTACLE_Y ", OBSTACLE_Y)
 
     avoidObject()
 
