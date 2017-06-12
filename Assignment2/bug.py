@@ -5,24 +5,23 @@ import matplotlib.pyplot as plt
 
 en_debug = 1
 
-# 519bc0bfe2b530c58ab22d0d717c4220cdcdd7a1
-
 DPR = 360.0/64
 WHEEL_RAD = 3.25 # Wheels are ~6.5 cm diameter.
 CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
 X = 0.0
 Y = 0.0
-X_Goal = 300.0
-Y_Goal = 0.0
+X_GOAL = 300.0
+Y_GOAL = 0.0
 theta = 0
+
 
 OBSTACLE_X = -1
 OBSTACLE_Y = -1
 
 
 theta_change = 30
-theta_actual_change = 36
+theta_actual_change = 39
 
 ERROR_mline = 4
 ERROR_goal = 20
@@ -37,11 +36,11 @@ Previous_Matrix = [[1, 0, 0],
                    [0, 1, 0],
                    [0, 0, 1]]
 
-BLOCKED_MLINE_X = []
-BLOCKED_MLINE_Y = []
+HIT_MLINE_X_LIST = []
+HIT_MLINE_Y_LIST = []
 
-UNBLOCKED_MLINE_X = []
-UNBLOCKED_MLINE_Y = []
+LEAVE_MLINE_X_LIST = []
+LEAVE_MLINE_Y_LIST = []
 SECONDVISITMLINE = -1
 
 def left_deg(deg=None):
@@ -103,11 +102,13 @@ def cm2pulse(dist):
         print 'pulses',pulses
     return pulses
 
+
 def fwd_cm(dist=None):
     if dist is not None:
         pulse = int(cm2pulse(dist))
         enc_tgt(1,1,pulse)
     fwd()
+
 
 def transform_matrix(rotate_angle, x_move, y_move):
     T = [[np.cos(rotate_angle/180.*3.14), -np.sin(rotate_angle/180.*3.14), x_move],
@@ -130,9 +131,9 @@ def update_pos(theta_change, X_change, Y_change):
 
     Previous_Matrix = np.dot(Previous_Matrix,transform_matrix(theta_change,X_change,Y_change))
     Current_Pos = np.dot(Previous_Matrix,Original_Pos)
-    
 
-    
+
+
     X = Current_Pos[0]
     Y = Current_Pos[1]
 
@@ -153,8 +154,8 @@ def update_pos(theta_change, X_change, Y_change):
         print "Y", Y
 
 
-def isGoal(X_Goal, Y_Goal, X, Y):
-    return abs(X - X_Goal) <= ERROR_goal and abs(Y - Y_Goal) <= ERROR_goal
+def isGoal(X_GOAL, Y_GOAL, X, Y):
+    return abs(X - X_GOAL) <= ERROR_goal and abs(Y - Y_GOAL) <= ERROR_goal
 
 
 
@@ -164,10 +165,10 @@ def posFeedback(theta_change, X_change, Y_change):
 
     update_pos(theta_change, X_change, Y_change)
 
-    if isGoal(X_Goal, Y_Goal, X, Y):
+    if isGoal(X_GOAL, Y_GOAL, X, Y):
         onGoal = True
 
-    if on_Mline(X_Goal, Y_Goal, X, Y):
+    if on_Mline(X_GOAL, Y_GOAL, X, Y):
         onMLine = True
 
     return onGoal, onMLine
@@ -178,16 +179,16 @@ def distance(x,y,k):
     return abs(y-k*x)/np.sqrt(1+k**2)
 
 
-def on_Mline(x_goal, y_goal, x, y):
+def on_Mline(X_GOAL, Y_GOAL, x, y):
     #y=kx
 
-    if(x_goal==0): #k not exist
+    if(X_GOAL==0): #k not exist
         if(x<=ERROR_mline):
             return True
         else:
             return False
 
-    k = y_goal/x_goal
+    k = Y_GOAL/X_GOAL
     dist = distance(x,y,k)
     if(dist<=ERROR_mline):
         return True
@@ -199,10 +200,10 @@ def avoidObject():
     onGoal, onMLine = posFeedback(0, 0, 0)
 
 
-    if len(BLOCKED_MLINE_X) > 0 and onMLine:
+    if len(HIT_MLINE_X_LIST) > 0 and onMLine:
         print("h mline")
-        for i in range(len(BLOCKED_MLINE_X)):
-            if abs(BLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(BLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
+        for i in range(len(HIT_MLINE_X_LIST)):
+            if abs(HIT_MLINE_X_LIST[i] - X) <= ERROR_mline and abs(HIT_MLINE_Y_LIST[i] - Y <= ERROR_mline):
                 print("No solution")
                 stop()
                 time.sleep(1)
@@ -211,8 +212,8 @@ def avoidObject():
     print("h mline value push")
     print("X ", X)
     print("Y ", Y)
-    BLOCKED_MLINE_X.append(X)
-    BLOCKED_MLINE_Y.append(Y)
+    HIT_MLINE_X_LIST.append(X)
+    HIT_MLINE_Y_LIST.append(Y)
 
     obstacle_move = 0
 
@@ -238,9 +239,7 @@ def avoidObject():
                 # no object front, but we have an object next. so we move forward
                 if not detect(20, 0):
 
-                    #OBSTACLE_X = 0
-                    #OBSTACLE_Y = -20
-
+                    # updating obstacle position
                     update_pos(0, 0, 0)
 
                     OBSTACLE_X_LIST.append(OBSTACLE_X)
@@ -263,10 +262,10 @@ def avoidObject():
                         if theta >= 0:
                             print(" h m line")
 
-                            if len(BLOCKED_MLINE_X) > 0 and onMLine:
+                            if len(HIT_MLINE_X_LIST) > 0 and onMLine:
                                 print("h mline")
-                                for i in range(len(BLOCKED_MLINE_X)):
-                                    if abs(BLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(BLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
+                                for i in range(len(HIT_MLINE_X_LIST)):
+                                    if abs(HIT_MLINE_X_LIST[i] - X) <= ERROR_mline and abs(HIT_MLINE_Y_LIST[i] - Y <= ERROR_mline):
                                         print("No solution 2!!!")
                                         stop()
                                         time.sleep(1)
@@ -277,10 +276,10 @@ def avoidObject():
                         else:
                             print("l m line")
 
-                            if len(UNBLOCKED_MLINE_X) > 0:
-                                for i in range(len(UNBLOCKED_MLINE_X)):
-                                     if abs(UNBLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
-                                     #if abs(UNBLOCKED_MLINE_X[i] - X) <= 30 and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
+                            if len(LEAVE_MLINE_X_LIST) > 0:
+                                for i in range(len(LEAVE_MLINE_X_LIST)):
+                                     if abs(LEAVE_MLINE_X_LIST[i] - X) <= ERROR_mline and abs(LEAVE_MLINE_Y_LIST[i] - Y <= ERROR_mline):
+                                     #if abs(LEAVE_MLINE_X_LIST[i] - X) <= 30 and abs(LEAVE_MLINE_Y_LIST[i] - Y <= ERROR_mline):
                                         print("second visit m line. just move forward.")
                                         #plot_path()
                                         #time.sleep(1)
@@ -288,9 +287,9 @@ def avoidObject():
                                         #time.sleep(3)
 
                             if not secondVisitMLine:
-                                if (X_Goal**2 + Y_Goal**2) > ((X_Goal - X)**2 + (Y_Goal - Y)**2):
-                                    UNBLOCKED_MLINE_X.append(X)
-                                    UNBLOCKED_MLINE_Y.append(Y)
+                                if (X_GOAL**2 + Y_GOAL**2) > ((X_GOAL - X)**2 + (Y_GOAL - Y)**2):
+                                    LEAVE_MLINE_X_LIST.append(X)
+                                    LEAVE_MLINE_Y_LIST.append(Y)
 
                                     print("MLINE VALUE PUSH")
                                     print("X ", X)
@@ -312,15 +311,15 @@ def avoidObject():
 
 
                                     if(bug2()):
-                                        return True
+                                        onGoal = True
 
+                    if onGoal:
+                        break
 
                 # object to the front and also object next to gopigo. Avoid it
                 else:
 
-                    #OBSTACLE_X = 20
-                    #OBSTACLE_Y = 0
-
+                    # updating obstacle position
                     update_pos(0, 0, 0)
 
                     OBSTACLE_X_LIST.append(OBSTACLE_X)
@@ -357,6 +356,10 @@ def avoidObject():
         servo(0)
         time.sleep(1)
 
+
+        if onGoal:
+            break
+
         # object next to gopigo too far away. Need to get closer to it.
         while not detect(20, 0):
             servo(90)
@@ -383,26 +386,26 @@ def plot_path():
     plt.plot(PLOT_X_LIST[-1], PLOT_Y_LIST[-1], 'ro')
     plt.plot(PLOT_X_LIST,PLOT_Y_LIST,'b')
     plt.plot(OBSTACLE_X_LIST, OBSTACLE_Y_LIST, 'rx')
-    plt.xlim((-20, max(X_Goal, Y_Goal) + 20 ))
-    plt.ylim((-20, max(X_Goal, Y_Goal) + 20 ))
+    plt.xlim((-20, max(X_GOAL, Y_GOAL) + 20 ))
+    plt.ylim((-20, max(X_GOAL, Y_GOAL) + 20 ))
 
 
 
 def orient_to_goal():
-    if X_Goal != 0 and Y_Goal > 0:
-        print '(Y_Goal/ X_Goal) / 3.14 * 180',np.arctan((Y_Goal/ X_Goal) / 3.14 * 180)
-        left_angle = np.arctan((Y_Goal/ X_Goal)) / 3.14 * 180
+    if X_GOAL != 0 and Y_GOAL > 0:
+        print '(Y_GOAL/ X_GOAL) / 3.14 * 180',np.arctan((Y_GOAL/ X_GOAL) / 3.14 * 180)
+        left_angle = np.arctan((Y_GOAL/ X_GOAL)) / 3.14 * 180
         left_deg(left_angle*scale)
         print 'left_angle', left_angle
         update_pos(left_angle,0,0)
-    elif X_Goal != 0 and Y_Goal < 0:
-        right_angle = np.arctan(-(Y_Goal/ X_Goal)) / 3.14 * 180
+    elif X_GOAL != 0 and Y_GOAL < 0:
+        right_angle = np.arctan(-(Y_GOAL/ X_GOAL)) / 3.14 * 180
         right_deg(right_angle)
         update_pos(-right_angle,0,0)
-    elif X_Goal == 0 and Y_Goal < 0:
+    elif X_GOAL == 0 and Y_GOAL < 0:
         right_deg(90)
         update_pos(-90,0,0)
-    elif X_Goal == 0 and Y_Goal > 0:
+    elif X_GOAL == 0 and Y_GOAL > 0:
         left_deg(90)
         update_pos(90,0,0)
 
@@ -418,7 +421,7 @@ def bug2():
     #Let the robot turn to the direction of the final goal
     orient_to_goal()
 
-    if isGoal(X_Goal, Y_Goal, X, Y):
+    if isGoal(X_GOAL, Y_GOAL, X, Y):
         plot_path()
         plt.savefig("result.png")
         stop()
@@ -432,19 +435,21 @@ def bug2():
                 plot_path()
                 plt.savefig("result.png")
                 stop()
+
                 return True
 
 
-    OBSTACLE_X = 20
-    OBSTACLE_Y = 0
-
+    # updating obstacle position
     update_pos(0, 0, 0)
 
-    print("updated")
-    print("X ", X)
-    print("Y ", Y)
-    print("OBSTACLE_X ", OBSTACLE_X)
-    print("OBSTACLE_Y ", OBSTACLE_Y)
+    OBSTACLE_X_LIST.append(OBSTACLE_X)
+    OBSTACLE_Y_LIST.append(OBSTACLE_Y)
+
+    # print("updated")
+    # print("X ", X)
+    # print("Y ", Y)
+    # print("OBSTACLE_X ", OBSTACLE_X)
+    # print("OBSTACLE_Y ", OBSTACLE_Y)
 
     avoidObject()
 
@@ -453,9 +458,10 @@ def bug2():
 
 
 if __name__ == '__main__':
+
     #Run bug2 algorithm
     bug2()
     plot_path()
 
     #Save trajectory picture
-    plt.savefig("result.png")
+    plt.savefig("result2.png")
