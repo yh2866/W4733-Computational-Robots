@@ -11,7 +11,7 @@ CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
 X = 0.0
 Y = 0.0
-X_GOAL = 300.0
+X_GOAL = 10.0
 Y_GOAL = 0.0
 theta = 0
 
@@ -313,8 +313,7 @@ def avoidObject():
                                     if(bug2()):
                                         onGoal = True
 
-                    if onGoal:
-                        break
+
 
                 # object to the front and also object next to gopigo. Avoid it
                 else:
@@ -340,7 +339,8 @@ def avoidObject():
 
                 servo(0)
 
-
+            if onGoal:
+                break
 
             servo(0)
             time.sleep(1)
