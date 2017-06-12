@@ -13,7 +13,7 @@ CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
 X = 0.0
 Y = 0.0
-X_Goal = 300.0
+X_Goal = 100.0
 Y_Goal = 0.0
 theta = 0
 
@@ -116,22 +116,29 @@ def transform_matrix(rotate_angle, x_move, y_move):
     return T
 
 
-def update_pos(theta_change, X_change, Y_change):
+def update_pos(theta_change, X_change, Y_change, obstacle_theta):
     global X
     global Y
     global theta
     global Previous_Matrix
     global OBSTACLE_X
     global OBSTACLE_Y
-    
+
     Previous_Matrix = np.dot(Previous_Matrix,transform_matrix(theta_change,X_change,Y_change))
     Current_Pos = np.dot(Previous_Matrix,Original_Pos)
-    Currrent_Pos_Obstacle = np.dot(Previous_Matrix, [[OBSTACLE_X], [OBSTACLE_Y], [1]])
+    Currrent_Pos_Obstacle = np.dot(np.dot(Previous_Matrix, transform_matrix(0,OBSTACLE_X,OBSTACLE_Y)), Original_Pos)
     X = Current_Pos[0]
     Y = Current_Pos[1]
 
     OBSTACLE_X = Currrent_Pos_Obstacle[0]
     OBSTACLE_Y = Currrent_Pos_Obstacle[1]
+
+    print("updated")
+    print("X ", X)
+    print("Y ", Y)
+    print("OBSTACLE_X ", OBSTACLE_X)
+    print("OBSTACLE_Y ", OBSTACLE_Y)
+
 
     theta += theta_change
     if theta > 180:
@@ -234,16 +241,16 @@ def avoidObject():
                     OBSTACLE_X = 0
                     OBSTACLE_Y = -20
 
-                    # using this to update obstacle location
                     update_pos(0, 0, 0)
 
                     OBSTACLE_X_LIST.append(OBSTACLE_X)
                     OBSTACLE_Y_LIST.append(OBSTACLE_Y)
 
-
                     fwd_cm(3)
                     obstacle_move += 3
                     onGoal, onMLine = posFeedback(0, 3, 0)
+
+
 
                     secondVisitMLine = False
 
@@ -314,7 +321,6 @@ def avoidObject():
                     OBSTACLE_X = 20
                     OBSTACLE_Y = 0
 
-                    # using this to update obstacle location
                     update_pos(0, 0, 0)
 
                     OBSTACLE_X_LIST.append(OBSTACLE_X)
@@ -322,6 +328,7 @@ def avoidObject():
 
                     left_deg(54)
                     update_pos(45,0,0)
+
                     time.sleep(1)
                     onMLine = False
                     onGoal = False
