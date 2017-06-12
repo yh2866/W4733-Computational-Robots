@@ -212,7 +212,7 @@ def avoidObject():
 
         while True:
             # check object next to gopigo
-            
+
             while detect(20, 10):
                 # check front too
                 servo(90)
@@ -222,7 +222,7 @@ def avoidObject():
 
                     OBSTACLE_X.append(X)
                     OBSTACLE_Y.append(Y - 20)
-                    
+
 
                     fwd_cm(3)
                     obstacle_move += 3
@@ -257,7 +257,7 @@ def avoidObject():
                                 for i in range(len(UNBLOCKED_MLINE_X)):
                                      if abs(UNBLOCKED_MLINE_X[i] - X) <= ERROR_mline and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
                                      #if abs(UNBLOCKED_MLINE_X[i] - X) <= 30 and abs(UNBLOCKED_MLINE_Y[i] - Y <= ERROR_mline):
-                                        print("second visit m line. just move forward.")  
+                                        print("second visit m line. just move forward.")
                                         #plot_path()
                                         #time.sleep(1)
                                         #plt.savefig("result.png")
@@ -293,7 +293,7 @@ def avoidObject():
 
                 # object to the front and also object next to gopigo. Avoid it
                 else:
-                    
+
                     OBSTACLE_X.append(X + 20)
                     OBSTACLE_Y.append(Y)
                     left_deg(54)
@@ -345,11 +345,10 @@ def plot_path():
     plt.plot(Plot_X[1:-2],Plot_Y[1:-2],'bo', )
     plt.plot(Plot_X[-1], Plot_Y[-1], 'ro')
     plt.plot(Plot_X,Plot_Y,'b')
-    #plt.plot(OBSTACLE_X, OBSTACLE_Y, 'rx')
-    #plt.xlim((-20, max(X_Goal, Y_Goal) + 20 ))
-    plt.xlim((-40, 40 + 20 ))
-    #plt.ylim((-20, max(X_Goal, Y_Goal) + 20 ))
-    plt.ylim((-40, 40 + 20 ))
+    plt.plot(OBSTACLE_X, OBSTACLE_Y, 'rx')
+    plt.xlim((-20, max(X_Goal, Y_Goal) + 20 ))
+    plt.ylim((-20, max(X_Goal, Y_Goal) + 20 ))
+
 
 
 def orient_to_goal():
@@ -383,7 +382,9 @@ def bug2():
     orient_to_goal()
 
     if isGoal(X_Goal, Y_Goal, X, Y):
-        # plot_path()
+        plot_path()
+        plt.savefig("result.png")
+        stop()
         return True
     else:
         while not detect(20, 0):
@@ -391,7 +392,9 @@ def bug2():
             onGoal, onMLine = posFeedback(0, 3, 0)
 
             if onGoal:
-                # plot_path()
+                plot_path()
+                plt.savefig("result.png")
+                stop()
                 return True
 
     avoidObject()
