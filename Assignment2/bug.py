@@ -12,7 +12,7 @@ CHASS_WID = 13.5 # Chassis is ~13.5 cm wide.DPR = 360.0/64
 
 X = 0.0
 Y = 0.0
-X_GOAL = 10.0
+X_GOAL = 150.0
 Y_GOAL = 0.0
 theta = 0
 
@@ -22,10 +22,10 @@ OBSTACLE_Y = -1
 
 
 theta_change = 30
-theta_actual_change = 39
+theta_actual_change = 38
 
 ERROR_mline = 4
-ERROR_goal = 20
+ERROR_goal = 6
 
 
 PLOT_X_LIST = []
@@ -207,9 +207,7 @@ def avoidObject():
         for i in range(len(HIT_MLINE_X_LIST)):
             if abs(HIT_MLINE_X_LIST[i] - X) <= ERROR_mline and abs(HIT_MLINE_Y_LIST[i] - Y <= ERROR_mline):
                 print("No solution")
-                stop()
-                time.sleep(1)
-                return True
+                return False
 
     print("h mline value push")
     print("X ", X)
@@ -271,9 +269,7 @@ def avoidObject():
                                 for i in range(len(HIT_MLINE_X_LIST)):
                                     if abs(HIT_MLINE_X_LIST[i] - X) <= ERROR_mline and abs(HIT_MLINE_Y_LIST[i] - Y <= ERROR_mline):
                                         print("No solution 2!!!")
-                                        stop()
-                                        time.sleep(1)
-                                        return True
+                                        return False
 
                             print("on m line, but got farther. Ignore")
 
@@ -312,10 +308,7 @@ def avoidObject():
 
                                     # on a new leave mline. So we basically perform another bug2 algo.
                                     if(bug2()):
-                                        print("bug2 success")
-                                        sys.exit()
-                                        print("bug2 success return")
-                                        return
+                                        return True
 
                 # object to the front and also object next to gopigo. Avoid it
                 else:
@@ -412,9 +405,6 @@ def bug2():
     orient_to_goal()
 
     if isGoal(X_GOAL, Y_GOAL, X, Y):
-        plot_path()
-        plt.savefig("result.png")
-        stop()
         return True
     else:
         # move forward while we don't see an object within 20 cm.
@@ -423,22 +413,24 @@ def bug2():
             onGoal, onMLine = posFeedback(0, 3, 0)
 
             if onGoal:
-                plot_path()
-                plt.savefig("result.png")
-                stop()
-
                 return True
 
     # found an obstacle. Avoid it.
-    avoidObject()
+    if(avoidObject()):
+        return True
+    else:
+        return False
 
 
 
 if __name__ == '__main__':
 
     #Run bug2 algorithm
-    bug2()
+    if(bug2()):
+        print("solution")
+    else:
+        print("no solution")
+        
     plot_path()
-
     #Save trajectory picture
     plt.savefig("result2.png")
