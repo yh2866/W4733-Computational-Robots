@@ -2,6 +2,7 @@ from gopigo import *
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 en_debug = 1
 
@@ -197,9 +198,10 @@ def on_Mline(X_GOAL, Y_GOAL, x, y):
 
 
 def avoidObject():
+
     onGoal, onMLine = posFeedback(0, 0, 0)
 
-
+    # check if we are on an already visited hit mline.
     if len(HIT_MLINE_X_LIST) > 0 and onMLine:
         print("h mline")
         for i in range(len(HIT_MLINE_X_LIST)):
@@ -217,7 +219,9 @@ def avoidObject():
 
     obstacle_move = 0
 
-    while detect(20, 0):
+
+    # move until we don't see an object
+    while detect(30, 0):
         left_deg(55)
         update_pos(45,0,0)
         time.sleep(1)
@@ -228,15 +232,15 @@ def avoidObject():
 
     while True:
 
-
         while True:
-            # check object next to gopigo
-
+            # check object next to gopigo. We need to always able to an object next to gopigo so that gopigo
+            # can circumnavigate it
             while detect(20, 10):
                 # check front too
                 servo(90)
                 time.sleep(0.5)
-                # no object front, but we have an object next. so we move forward
+
+                # no object front, but we have an object next. so we move forward and continue circumnavigate
                 if not detect(20, 0):
 
                     # updating obstacle position
@@ -249,18 +253,18 @@ def avoidObject():
                     obstacle_move += 3
                     onGoal, onMLine = posFeedback(0, 3, 0)
 
-
-
                     secondVisitMLine = False
 
                     if onGoal:
                         return True
 
+                    # we could get on an mline point
                     elif onMLine and obstacle_move > 10:
                         print("check h or l mline")
 
+                        # check if this mline is a hit mline point or a leave mline point. (theta >= 0) means a hit mline point.
                         if theta >= 0:
-                            print(" h m line")
+                            print(" hit m line point")
 
                             if len(HIT_MLINE_X_LIST) > 0 and onMLine:
                                 print("h mline")
@@ -274,17 +278,13 @@ def avoidObject():
                             print("on m line, but got farther. Ignore")
 
                         else:
-                            print("l m line")
+                            print("leave m line point")
 
                             if len(LEAVE_MLINE_X_LIST) > 0:
                                 for i in range(len(LEAVE_MLINE_X_LIST)):
                                      if abs(LEAVE_MLINE_X_LIST[i] - X) <= ERROR_mline and abs(LEAVE_MLINE_Y_LIST[i] - Y <= ERROR_mline):
-                                     #if abs(LEAVE_MLINE_X_LIST[i] - X) <= 30 and abs(LEAVE_MLINE_Y_LIST[i] - Y <= ERROR_mline):
                                         print("second visit m line. just move forward.")
-                                        #plot_path()
-                                        #time.sleep(1)
-                                        #plt.savefig("result.png")
-                                        #time.sleep(3)
+
 
                             if not secondVisitMLine:
                                 if (X_GOAL**2 + Y_GOAL**2) > ((X_GOAL - X)**2 + (Y_GOAL - Y)**2):
@@ -310,10 +310,12 @@ def avoidObject():
                                     time.sleep(0.5)
 
 
+                                    # on a new leave mline. So we basically perform another bug2 algo.
                                     if(bug2()):
-                                        onGoal = True
-
-
+                                        print("bug2 success")
+                                        sys.exit()
+                                        print("bug2 success return")
+                                        return
 
                 # object to the front and also object next to gopigo. Avoid it
                 else:
@@ -324,12 +326,6 @@ def avoidObject():
                     OBSTACLE_X_LIST.append(OBSTACLE_X)
                     OBSTACLE_Y_LIST.append(OBSTACLE_Y)
 
-                    print("updated")
-                    print("X ", X)
-                    print("Y ", Y)
-                    print("OBSTACLE_X ", OBSTACLE_X)
-                    print("OBSTACLE_Y ", OBSTACLE_Y)
-
                     left_deg(55)
                     update_pos(45,0,0)
 
@@ -339,8 +335,6 @@ def avoidObject():
 
                 servo(0)
 
-            if onGoal:
-                break
 
             servo(0)
             time.sleep(1)
@@ -354,16 +348,12 @@ def avoidObject():
 
 
         servo(0)
-        time.sleep(1)
+        time.sleep(0.2)
 
-
-        if onGoal:
-            break
-
-        # object next to gopigo too far away. Need to get closer to it.
+        # object next to gopigo got too far away. Need to get closer to it so gopigo can continue circumnavigating it
         while not detect(20, 0):
             servo(90)
-            time.sleep(1)
+            time.sleep(0.2)
 
             if not detect(20, 0):
                 print("not detect")
@@ -427,6 +417,7 @@ def bug2():
         stop()
         return True
     else:
+        # move forward while we don't see an object within 20 cm.
         while not detect(20, 0):
             fwd_cm(3)
             onGoal, onMLine = posFeedback(0, 3, 0)
@@ -438,22 +429,8 @@ def bug2():
 
                 return True
 
-
-    # updating obstacle position
-    update_pos(0, 0, 0)
-
-    OBSTACLE_X_LIST.append(OBSTACLE_X)
-    OBSTACLE_Y_LIST.append(OBSTACLE_Y)
-
-    # print("updated")
-    # print("X ", X)
-    # print("Y ", Y)
-    # print("OBSTACLE_X ", OBSTACLE_X)
-    # print("OBSTACLE_Y ", OBSTACLE_Y)
-
+    # found an obstacle. Avoid it.
     avoidObject()
-
-
 
 
 
