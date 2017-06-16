@@ -18,10 +18,6 @@ class Vertex:
         self.backpointer = None
 
 
-    def isSame(self, u):
-        return self.x == u.x and self.y == u.y
-
-
 class Graph:
     def __init__(self, pairs):
         self.vertices = []
@@ -64,11 +60,7 @@ class Graph:
                 for e in self.vertices[vId].adj:
 
                     if self.vertices[vId].cost + e.cost < self.vertices[e.targetVId].cost:
-
-
                         cost = self.vertices[vId].cost + e.cost
-
-
                         heapq.heappush(pq, (cost, e.targetVId, vId))
 
 
@@ -83,7 +75,6 @@ class Graph:
         while(vId != sId):
             stk.append(vId)
             vId = self.vertices[vId].backpointer
-
         stk.append(sId)
 
         result = []
