@@ -52,15 +52,15 @@ def find_angle(x, y):
     return math.atan2(y[1]-x[1], y[0]-x[0])
 
 def sort_points(points_array):
-    #find leftmost point
+    #find rightmost point
     up = 300
     rightmost = points_array[0]
     for i in range(len(points_array)):
         if(points_array[i][1]<up):  #below the curr
-            if(rightmost[0]<points_array[0]):   #to the right of curr
+            if(rightmost[0]<points_array[i][0]):   #to the right of curr
                 rightmost = points_array[i]
                 up = rightmost[1]
-    print "rightmost:", points_array[0]
+    print "rightmost:", rightmost
 
     #store point with angle
     angle = []
@@ -72,6 +72,7 @@ def sort_points(points_array):
 
     #sort by angle, result = sorted points CCW
     yx = zip(angle, points)
+    print "yx ", yx
     yx.sort()
     points = [x for y,x in yx]
     #print points
@@ -137,10 +138,10 @@ if __name__ == "__main__":
     plot_environment(object2)
     plot_environment(object3)
     plot_environment(object4)
-    plot_environment(np.array(graham_scan(grown_obstacle(object1))))
-    plot_environment(np.array(graham_scan(grown_obstacle(object2))))
-    plot_environment(np.array(graham_scan(grown_obstacle(object3))))
-    plot_environment(np.array(graham_scan(grown_obstacle(object4))))
+    l = [list(x) for x in grown_obstacle(object1)]
+    print "l ", l
+
+    plot_environment(np.array(graham_scan(l)))
     plt.xlim([0,dimensions_x])
     plt.ylim([0,dimensions_y])
     plt.show()
