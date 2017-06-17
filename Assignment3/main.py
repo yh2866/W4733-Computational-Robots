@@ -257,6 +257,44 @@ class Graph:
         return result
 
 
+def detect_intersect(segment1, segment2):
+    x1 = segment1[0][0]
+    x2 = segment1[1][0]
+    y1 = segment1[0][1]
+    y2 = segment1[1][1]
+    x3 = segment2[0][0]
+    x4 = segment2[1][0]
+    y3 = segment2[0][1]
+    y4 = segment2[1][1]
+    if x1!=x2 and x3!=x4: 
+        a1 = (y1-y2)/(x1-x2)
+        a2 = (y3-y4)/(x3-x4)
+    elif x1==x2:
+        a1 = 10000;
+    elif x3==x4:
+        a2 = 10000;
+    b1 = -1;
+    b2 = -1;
+    c1 = y1 - a1*x1;
+    c2 = y3 - a2*x3;
+    #using the sign function from numpy
+    f1_1 = np.sign(a1*x3 + b1*y3 + c1);
+    f1_2 = np.sign(a1*x4 + b1*y4 + c1);
+    f2_1 = np.sign(a2*x1 + b2*y1 + c2);
+    f2_2 = np.sign(a2*x2 + b2*y2 + c2);
+    print "f1_1",f1_1
+    print "f1_2",f1_2
+    print "f2_1",f2_1
+    print "f2_2",f2_2
+
+    if (f1_1 == f1_2) or (f2_1 == f2_2):
+        print "Not intersect"
+        return False
+    if (f1_1 != f1_2) and (f2_1 != f2_2):
+        print "Intersect"
+        return True
+
+
 if __name__ == "__main__":
     plt.plot(start_point[0],start_point[1],'go',ms=10)
     plt.plot(goal_point[0],goal_point[1],'go',ms=10)
