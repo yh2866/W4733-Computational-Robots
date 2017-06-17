@@ -117,7 +117,7 @@ def toTheLeft(a, b, c):
 
 def graham_scan(points_array):
     points_array = sort_points(points_array)
-    print points_array
+    # print points_array
 
     s = [] #push pop size
     s.append(points_array[-1])
@@ -249,29 +249,34 @@ def check_intersect(segment1, segment2):
         if X1 == X2 == X3 == X4:
             return True
         elif X1 == X2:
-            A2 = (Y3-Y4)/(X3-X4)
+            # print "x1 == x2"
+            A2 = (Y3-Y4)/float(X3-X4)
             b2 = Y3-A2*X3
 
-            if A2 * X1 + b2 >= min(Y1, Y2) and A2 * X1 + b2 <= max (Y1, Y2):
+            if X1 <= min(X3, X4) or X1 >= max(X3, X4):
+                return False
+            elif A2 * X1 + b2 >= min(Y1, Y2) and A2 * X1 + b2 <= max (Y1, Y2):
                 return True
             else:
                 return False
 
         elif X3 == X4:
-            # print "x3 == x4"
-            # print "Y1 - Y2 ", Y1 - Y2
-            # print "X1 - X2 ", X1 - X2
+            print "x3 == x4"
+            print "Y1 - Y2 ", Y1 - Y2
+            print "X1 - X2 ", X1 - X2
             A1 = (Y1-Y2) / float(X1-X2)
             b1 = Y1-A1*X1
 
-            # print "X1 ", X1
-            # print "X2 ", X2
-            # print "Y1 ", Y1
-            # print "Y2 ", Y2
-            # print "A1 ", A1
-            # print "b1 ", b1
+            print "X1 ", X1
+            print "X2 ", X2
+            print "Y1 ", Y1
+            print "Y2 ", Y2
+            print "A1 ", A1
+            print "b1 ", b1
 
-            if A1 * X3 + b1 >= min(Y3, Y4) and A1 * X3 + b1 <= max (Y3, Y4):
+            if X3 <= min(X1, X2) or X3 >= max(X1, X2):
+                return False
+            elif A1 * X3 + b1 >= min(Y3, Y4) and A1 * X3 + b1 <= max (Y3, Y4):
                 return True
             else:
                 return False
@@ -290,12 +295,12 @@ def check_intersect(segment1, segment2):
     Xa = (b2 - b1) / float(A1 - A2)
 
     if A1 * Xa + b1 != A2 * Xa + b2:
-        print "False 1"
+        # print "False 1"
         return False
 
     if ( (Xa < max( min(X1,X2), min(X3,X4) )) or
         (Xa > min( max(X1,X2), max(X3,X4) )) ):
-        print "False 2"
+        # print "False 2"
         return False
     else:
         return True
@@ -361,10 +366,6 @@ if __name__ == "__main__":
     # r3 = graham_scan(c)
     # r4 = graham_scan(d)
 
-    print "r2 ",
-
-    for pt in r2:
-        print pt
 
     # plot_grown_obstacle(np.array(r1))
     plot_grown_obstacle(np.array(r2))
@@ -372,13 +373,14 @@ if __name__ == "__main__":
     # plot_grown_obstacle(np.array(r4))
 
     r = r2
+    # print "r len", len(r)
 
-    r = [start_point] + r + [goal_point]
+    pts = [start_point] + r + [goal_point]
+    graph = Graph(pts)
 
-    print "r ", r
-    graph = Graph(r)
-
+    # [[[x1, y1], [x2, y2]], [[],[]] ]
     objectEdges = []
+
 
     # for i in range(1, len(r1)):
     #     objectEdges.append([r1[i], r1[i - 1]])
@@ -402,71 +404,101 @@ if __name__ == "__main__":
 
 
 
-    for i in range(len(r)):
+    # for i in range(len(r)):
+
+    #     for j in range(i + 1, len(r)):
+    #         testEdges = []
+    #         for e in objectEdges:
+    #             if e[0] != r[i] and e[1] != r[i] and e[0] != r[j] and e[1] != r[j]:
+    #                 testEdges.append(e)
+
+    #         print "ri ", r[i]
+    #         print "rj ", r[j]
+
+    #         # print "testEdges ", testEdges
+
+    #         testPass = True
+
+    #         for e in testEdges:
+    #             if check_intersect([r[i], r[j]], e):
+    #                 testPass = False
+
+    #         if testPass:
+    #             graph.addUndirectedEdge(i, j)
+    #             plt.plot([graph.vertices[i].x, graph.vertices[j].x], [graph.vertices[i].y, graph.vertices[j].y], 'y-')
+    #         print "testPass ", testPass
+
+
+    # print "start adj endges"
+    # for e in graph.vertices[0].adj:
+    #     print "x ", graph.vertices[e.targetVId].x
+    #     print "y ", graph.vertices[e.targetVId].y
+
+
+    # print "test edge case ", check_intersect([goal_point, [145.35287801000001, 194.640170509]], [[107.0, 157.0], [107.0, 180.0]])
+
+    # goalIdx = len(pts) - 1
+
+    # for j in range(len(r)):
+    #     testEdges = []
+
+    #     for e in objectEdges:
+    #         # print "e ", e
+
+    #         # e = [[starx, starty], [endx, endy]]
+    #         if e[0] != pts[goalIdx] and e[1] != pts[goalIdx] and e[0] != r[j] and e[1] != r[j]:
+    #             testEdges.append(e)
+
+    #     print "start point ", pts[i]
+    #     print "rj ", r[j]
+    #     print "testEdges ", testEdges
+    #     print "testEges len ", len(testEdges)
+
+    #     testPass = True
+
+    #     for e in testEdges:
+    #         if check_intersect([pts[goalIdx], r[j]], e):
+    #             if r[j] == [145.35287801000001, 194.640170509]:
+    #                 print "145 e ", e
+    #             testPass = False
+
+    #     if testPass:
+    #         graph.addUndirectedEdge(goalIdx, j + 1)
+    #         plt.plot([graph.vertices[goalIdx].x, graph.vertices[j + 1].x], [graph.vertices[goalIdx].y, graph.vertices[j + 1].y], 'y-')
+
+    #     print "testPass ", testPass
+
+
+    goalIdx = 0
+
+    for j in range(len(r)):
         testEdges = []
 
-        for j in range(i + 1, len(r)):
+        for e in objectEdges:
+            # print "e ", e
 
-            for e in objectEdges:
-                if e[0] != r[i] and e[1] != r[i] and e[0] != r[j] and e[1] != r[j]:
-                    testEdges.append(e)
+            # e = [[starx, starty], [endx, endy]]
+            if e[0] != pts[goalIdx] and e[1] != pts[goalIdx] and e[0] != r[j] and e[1] != r[j]:
+                testEdges.append(e)
 
-            print "ri ", r[i]
-            print "rj ", r[j]
+        print "start point ", pts[goalIdx]
+        print "rj ", r[j]
+        print "testEdges ", testEdges
+        print "testEges len ", len(testEdges)
 
-            # print "testEdges ", testEdges
+        testPass = True
 
-            testPass = True
+        for e in testEdges:
+            if check_intersect([pts[goalIdx], r[j]], e):
+                if r[j] == [145.35287801000001, 194.640170509]:
+                    print "145 e ", e
+                testPass = False
 
-            for e in testEdges:
-                if check_intersect([r[i], r[j]], e):
-                    testPass = False
+        if testPass:
+            graph.addUndirectedEdge(goalIdx, j + 1)
+            plt.plot([graph.vertices[goalIdx].x, graph.vertices[j + 1].x], [graph.vertices[goalIdx].y, graph.vertices[j + 1].y], 'y-')
 
-            if testPass:
-                graph.addUndirectedEdge(i, j)
-                plt.plot([graph.vertices[i].x, graph.vertices[j].x], [graph.vertices[i].y, graph.vertices[j].y], 'y-')
-            print "testPass ", testPass
-
-
-    # print "start adj endges"
-    # for e in graph.vertices[0].adj:
-    #     print "x ", graph.vertices[e.targetVId].x
-    #     print "y ", graph.vertices[e.targetVId].y
-
-
-    # print "test edge case ", check_intersect([start_point, goal_point], [[159.99718149399999, 179.588779362], [159.99718149399999, 156.588779362]])
-
-    # i = 0
-    # testEdges = []
-
-    # j = len(r) - 1
-
-    # for e in objectEdges:
-    #     if e[0] != r[i] and e[1] != r[i] and e[0] != r[j] and e[1] != r[j]:
-    #         testEdges.append(e)
-
-    # print "ri ", r[i]
-    # print "rj ", r[j]
-
-    # print "testEdges ", testEdges
-    # print "testEges len ", len(testEdges)
-
-    # testPass = True
-
-    # for e in testEdges:
-    #     if detect_intersect([r[i], r[j]], e):
-    #         testPass = False
-
-    # if testPass:
-    #     graph.addUndirectedEdge(i, j)
-
-    # print "testPass ", testPass
-
-
-    # print "start adj endges"
-    # for e in graph.vertices[0].adj:
-    #     print "x ", graph.vertices[e.targetVId].x
-    #     print "y ", graph.vertices[e.targetVId].y
+        print "testPass ", testPass
 
 
     # graph.dijkstra(0)
