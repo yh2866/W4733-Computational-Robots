@@ -31,6 +31,12 @@ def plot_environment(object):
     plt.plot((object[-1,0],object[0,0]),(object[-1,1],object[0,1]),'b-')
     return
 
+def plot_grown_obstacle(object):
+    plt.plot(object[:,0],object[:,1],'r-')
+    plt.plot((object[-1,0],object[0,0]),(object[-1,1],object[0,1]),'r-')
+    plt.plot(object[:,0],object[:,1],'ko')
+    return
+
 def plot_shortestPath(object):
     plt.plot(object[:,0],object[:,1],'g-')
     plt.plot((object[-1,0],object[0,0]),(object[-1,1],object[0,1]),'g-')
@@ -48,7 +54,7 @@ def grown_obstacle(object):
         grown_obstacle[2*l+i][1] = object[i][1]
         grown_obstacle[3*l+i][0] = object[i][0]
         grown_obstacle[3*l+i][1] = object[i][1]-23
-        plt.plot(grown_obstacle[:,0],grown_obstacle[:,1],'ro')
+        #plt.plot(grown_obstacle[:,0],grown_obstacle[:,1],'ko')
     return grown_obstacle
 
 
@@ -252,12 +258,12 @@ class Graph:
 
 
 if __name__ == "__main__":
-    plt.plot(start_point[0],start_point[1],'go')
-    plt.plot(goal_point[0],goal_point[1],'go')
-    #plot_environment(object1)
-    #plot_environment(object2)
-    #plot_environment(object3)
-    #plot_environment(object4)
+    plt.plot(start_point[0],start_point[1],'go',ms=10)
+    plt.plot(goal_point[0],goal_point[1],'go',ms=10)
+    plot_environment(object1)
+    plot_environment(object2)
+    plot_environment(object3)
+    plot_environment(object4)
 
     a = [list(x) for x in grown_obstacle(object1)]
     b = [list(x) for x in grown_obstacle(object2)]
@@ -269,10 +275,10 @@ if __name__ == "__main__":
     r3 = graham_scan(c)
     r4 = graham_scan(d)
 
-    plot_environment(np.array(r1))
-    plot_environment(np.array(r2))
-    plot_environment(np.array(r3))
-    plot_environment(np.array(r4))
+    plot_grown_obstacle(np.array(r1))
+    plot_grown_obstacle(np.array(r2))
+    plot_grown_obstacle(np.array(r3))
+    plot_grown_obstacle(np.array(r4))
 
     # r = a + b + c + d
 
