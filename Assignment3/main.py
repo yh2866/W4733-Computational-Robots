@@ -282,27 +282,28 @@ def check_intersect(segment1, segment2):
                 return False
 
 
-    A1 = (Y1-Y2)/float(X1-X2)
-    A2 = (Y3-Y4)/float(X3-X4)
 
-    b1 = Y1-A1*X1
-    b2 = Y3-A2*X3
+    a1 = (Y1-Y2)/(X1-X2)
+    a2 = (Y3-Y4)/(X3-X4)
+    b1 = -1;
+    b2 = -1;
+    c1 = Y1 - a1*X1;
+    c2 = Y3 - a2*X3;
+    #using the sign function from numpy
+    f1_1 = np.sign(a1*X3 + b1*Y3 + c1);
+    f1_2 = np.sign(a1*X4 + b1*Y4 + c1);
+    f2_1 = np.sign(a2*X1 + b2*Y1 + c2);
+    f2_2 = np.sign(a2*X2 + b2*Y2 + c2);
+    # print "f1_1",f1_1
+    # print "f1_2",f1_2
+    # print "f2_1",f2_1
+    # print "f2_2",f2_2
 
-    if (A1 == A2):
-        # print "False 0"
+    if (f1_1 == f1_2) or (f2_1 == f2_2):
+        # print "Not intersect"
         return False
-
-    Xa = (b2 - b1) / float(A1 - A2)
-
-    if A1 * Xa + b1 != A2 * Xa + b2:
-        # print "False 1"
-        return False
-
-    if ( (Xa < max( min(X1,X2), min(X3,X4) )) or
-        (Xa > min( max(X1,X2), max(X3,X4) )) ):
-        # print "False 2"
-        return False
-    else:
+    if (f1_1 != f1_2) and (f2_1 != f2_2):
+        # print "Intersect"
         return True
 
 
@@ -437,36 +438,36 @@ if __name__ == "__main__":
 
     # print "test edge case ", check_intersect([goal_point, [145.35287801000001, 194.640170509]], [[107.0, 157.0], [107.0, 180.0]])
 
-    # goalIdx = len(pts) - 1
+    goalIdx = len(pts) - 1
 
-    # for j in range(len(r)):
-    #     testEdges = []
+    for j in range(len(r)):
+        testEdges = []
 
-    #     for e in objectEdges:
-    #         # print "e ", e
+        for e in objectEdges:
+            # print "e ", e
 
-    #         # e = [[starx, starty], [endx, endy]]
-    #         if e[0] != pts[goalIdx] and e[1] != pts[goalIdx] and e[0] != r[j] and e[1] != r[j]:
-    #             testEdges.append(e)
+            # e = [[starx, starty], [endx, endy]]
+            if e[0] != pts[goalIdx] and e[1] != pts[goalIdx] and e[0] != r[j] and e[1] != r[j]:
+                testEdges.append(e)
 
-    #     print "start point ", pts[i]
-    #     print "rj ", r[j]
-    #     print "testEdges ", testEdges
-    #     print "testEges len ", len(testEdges)
+        print "start point ", pts[i]
+        print "rj ", r[j]
+        print "testEdges ", testEdges
+        print "testEges len ", len(testEdges)
 
-    #     testPass = True
+        testPass = True
 
-    #     for e in testEdges:
-    #         if check_intersect([pts[goalIdx], r[j]], e):
-    #             if r[j] == [145.35287801000001, 194.640170509]:
-    #                 print "145 e ", e
-    #             testPass = False
+        for e in testEdges:
+            if check_intersect([pts[goalIdx], r[j]], e):
+                if r[j] == [145.35287801000001, 194.640170509]:
+                    print "145 e ", e
+                testPass = False
 
-    #     if testPass:
-    #         graph.addUndirectedEdge(goalIdx, j + 1)
-    #         plt.plot([graph.vertices[goalIdx].x, graph.vertices[j + 1].x], [graph.vertices[goalIdx].y, graph.vertices[j + 1].y], 'y-')
+        if testPass:
+            graph.addUndirectedEdge(goalIdx, j + 1)
+            plt.plot([graph.vertices[goalIdx].x, graph.vertices[j + 1].x], [graph.vertices[goalIdx].y, graph.vertices[j + 1].y], 'y-')
 
-    #     print "testPass ", testPass
+        print "testPass ", testPass
 
 
     goalIdx = 0
