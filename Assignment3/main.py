@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import heapq
 import math
 
 start_point = [10,20]
@@ -28,6 +29,11 @@ object4 = np.array([[230, 170],
 def plot_environment(object):
     plt.plot(object[:,0],object[:,1],'b-')
     plt.plot((object[-1,0],object[0,0]),(object[-1,1],object[0,1]),'b-')
+    return
+
+def plot_shortestPath(object):
+    plt.plot(object[:,0],object[:,1],'g-')
+    plt.plot((object[-1,0],object[0,0]),(object[-1,1],object[0,1]),'g-')
     return
 
 def grown_obstacle(object):
@@ -126,9 +132,92 @@ def graham_scan(points_array):
     return result[::-1] #reverse list
 
 
-points_array = [[1,0],[1,1],[0.5,0],[0,1],[0.5,0.5]]
-result = graham_scan(points_array)
-print result
+# points_array = [[1,0],[1,1],[0.5,0],[0,1],[0.5,0.5]]
+# result = graham_scan(points_array)
+# print result
+
+
+class Edge:
+    def __init__(self, targetVId, cost):
+        self.targetVId = targetVId
+        self.cost = cost
+
+
+class Vertex:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.cost = float('inf')
+        self.adj = []
+        self.visited = False
+        self.backpointer = None
+
+
+class Graph:
+    def __init__(self, pairs):
+        self.vertices = []
+
+        for p in pairs:
+            self.vertices.append(Vertex(p[0], p[1]))
+
+
+    def addEdge(self, uId, vId):
+        cost = self.computeEuclidean(uId, vId)
+        e = Edge(vId, cost)
+        self.vertices[uId].adj.append(e)
+
+
+    def addUndirectedEdge(self, uId, vId):
+        self.addEdge(uId, vId)
+        self.addEdge(vId, uId)
+
+
+    def computeEuclidean(self, uId, vId):
+        return math.sqrt(math.pow(self.vertices[uId].x - self.vertices[vId].x, 2) +
+            math.pow(self.vertices[uId].y - self.vertices[vId].y, 2))
+
+
+    # s is the start vertex Id
+    def dijkstra(self, sId):
+        pq =[]
+
+        heapq.heappush(pq, (0, sId, None))
+
+        while pq:
+            cost, vId, backpointer = heapq.heappop(pq)
+            print("v x ", self.vertices[vId].x)
+            print("v y ", self.vertices[vId].y)
+            if not self.vertices[vId].visited:
+                self.vertices[vId].visted = True
+                self.vertices[vId].cost = cost
+                self.vertices[vId].backpointer = backpointer
+
+                for e in self.vertices[vId].adj:
+
+                    if self.vertices[vId].cost + e.cost < self.vertices[e.targetVId].cost:
+                        cost = self.vertices[vId].cost + e.cost
+                        heapq.heappush(pq, (cost, e.targetVId, vId))
+
+
+
+
+    def shortestPath(self, sId, gId):
+        self.dijkstra(sId)
+        stk = []
+
+        vId = gId
+
+        while(vId != sId):
+            stk.append(vId)
+            vId = self.vertices[vId].backpointer
+        stk.append(sId)
+
+        result = []
+
+        while stk:
+            result.append(stk.pop())
+
+        return result
 
 
 if __name__ == "__main__":
@@ -138,10 +227,45 @@ if __name__ == "__main__":
     plot_environment(object2)
     plot_environment(object3)
     plot_environment(object4)
-    l = [list(x) for x in grown_obstacle(object1)]
-    print "l ", l
 
-    plot_environment(np.array(graham_scan(l)))
+    a = [list(x) for x in grown_obstacle(object1)]
+    b = [list(x) for x in grown_obstacle(object2)]
+    c = [list(x) for x in grown_obstacle(object3)]
+    d = [list(x) for x in grown_obstacle(object4)]
+
+    r1 = graham_scan(a)
+    r2 = graham_scan(b)
+    r3 = graham_scan(c)
+    r4 = graham_scan(d)
+
+    plot_environment(np.array(r1))
+    plot_environment(np.array(r2))
+    plot_environment(np.array(r3))
+    plot_environment(np.array(r4))
+
+    # r = a + b + c + d
+
+    # graph = Graph(r)
+
+    # for i in range(len(r)):
+    #     for j in range(i + 1, len(r)):
+    #         graph.addUndirectedEdge(i, j)
+
+    # r.append(start_point)
+    # r.append(goal_point)
+
+    # graph.dijkstra(len(r) - 2)
+    # result_vertex_indices = graph.shortestPath(len(r) - 2, len(r) - 1)
+
+    # result = []
+
+    # for i in result_vertex_indices:
+    #     result.append([graph.vertices[i].x, graph.vertices[i].y])
+
+    # print(result)
+
+    # plot_shortestPath(np.array(result))
+
     plt.xlim([0,dimensions_x])
     plt.ylim([0,dimensions_y])
     plt.show()
