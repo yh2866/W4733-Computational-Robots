@@ -275,32 +275,32 @@ def detect_intersect(segment1, segment2):
 if __name__ == "__main__":
     plt.plot(start_point[0],start_point[1],'go',ms=10)
     plt.plot(goal_point[0],goal_point[1],'go',ms=10)
-    plot_environment(object1)
+    # plot_environment(object1)
     plot_environment(object2)
-    plot_environment(object3)
-    plot_environment(object4)
+    # plot_environment(object3)
+    # plot_environment(object4)
 
-    a = [list(x) for x in grown_obstacle(object1)]
+    # a = [list(x) for x in grown_obstacle(object1)]
     b = [list(x) for x in grown_obstacle(object2)]
-    c = [list(x) for x in grown_obstacle(object3)]
-    d = [list(x) for x in grown_obstacle(object4)]
+    # c = [list(x) for x in grown_obstacle(object3)]
+    # d = [list(x) for x in grown_obstacle(object4)]
 
-    r1 = graham_scan(a)
+    # r1 = graham_scan(a)
     r2 = graham_scan(b)
-    r3 = graham_scan(c)
-    r4 = graham_scan(d)
+    # r3 = graham_scan(c)
+    # r4 = graham_scan(d)
 
     print "r2 ",
 
     for pt in r2:
         print pt
 
-    plot_grown_obstacle(np.array(r1))
+    # plot_grown_obstacle(np.array(r1))
     plot_grown_obstacle(np.array(r2))
-    plot_grown_obstacle(np.array(r3))
-    plot_grown_obstacle(np.array(r4))
+    # plot_grown_obstacle(np.array(r3))
+    # plot_grown_obstacle(np.array(r4))
 
-    r = r1 + r2 + r3 + r4
+    r = r2
 
     r = [start_point] + r + [goal_point]
 
@@ -309,25 +309,25 @@ if __name__ == "__main__":
 
     objectEdges = []
 
-    for i in range(1, len(r1)):
-        objectEdges.append([r1[i], r1[i - 1]])
+    # for i in range(1, len(r1)):
+    #     objectEdges.append([r1[i], r1[i - 1]])
 
-    objectEdges.append([r1[0], r1[-1]])
+    # objectEdges.append([r1[0], r1[-1]])
 
     for i in range(1, len(r2)):
         objectEdges.append([r2[i], r2[i - 1]])
 
     objectEdges.append([r2[0], r2[-1]])
 
-    for i in range(1, len(r3)):
-        objectEdges.append([r3[i], r3[i - 1]])
+    # for i in range(1, len(r3)):
+    #     objectEdges.append([r3[i], r3[i - 1]])
 
-    objectEdges.append([r3[0], r3[-1]])
+    # objectEdges.append([r3[0], r3[-1]])
 
-    for i in range(1, len(r4)):
-        objectEdges.append([r4[i], r4[i - 1]])
+    # for i in range(1, len(r4)):
+    #     objectEdges.append([r4[i], r4[i - 1]])
 
-    objectEdges.append([r4[0], r4[-1]])
+    # objectEdges.append([r4[0], r4[-1]])
 
 
 
@@ -363,6 +363,8 @@ if __name__ == "__main__":
     #     print "y ", graph.vertices[e.targetVId].y
 
 
+    print "test edge case ", detect_intersect([start_point, goal_point], [[159.99718149399999, 179.588779362], [159.99718149399999, 156.588779362]])
+
     i = 0
     testEdges = []
 
@@ -376,6 +378,7 @@ if __name__ == "__main__":
     print "rj ", r[j]
 
     print "testEdges ", testEdges
+    print "testEges len ", len(testEdges)
 
     testPass = True
 
