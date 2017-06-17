@@ -51,85 +51,34 @@ def grown_obstacle(object):
         plt.plot(grown_obstacle[:,0],grown_obstacle[:,1],'ro')
     return grown_obstacle
 
-def find_angle(x, y):
-    """
-    return angle between two points
-    """
-    return math.atan2(y[1]-x[1], y[0]-x[0])
 
-def sort_points(points_array):
-    #find rightmost point
-    up = 300
-    rightmost = points_array[0]
-    for i in range(len(points_array)):
-        if(points_array[i][1]<up):  #below the curr
-            if(rightmost[0]<points_array[i][0]):   #to the right of curr
-                rightmost = points_array[i]
-                up = rightmost[1]
-    print "rightmost:", rightmost
 
-    #store point with angle
-    angle = []
-    points = []
-    for i in range(0,len(points_array)):
-        point = points_array[i]     #extract each point
-        points.append(point)
-        angle.append(find_angle(rightmost, point))    #find slope
-
-    #sort by angle, result = sorted points CCW
-    yx = zip(angle, points)
-    print "yx ", yx
-    yx.sort()
-    points = [x for y,x in yx]
-    #print points
-
-    return points
-
-#def toTheLeft(point, s1, s2):
-def toTheLeft(a, b, c):
-    #s2 is the base
-    """test cross-product"""
-
-    result = (b[1] - a[1]) *(c[0] - a[0]) - (b[0] - a[0]) * (c[1] - a[1])
-    if(result>=0):
-        return True
-    return False
-    """
-    print s1,s2
-    v1 = [(s1[0]-s2[0]),(s1[1]-s2[1])]
-    v2 = [(point[0]-s1[0]),(point[1]-s1[1])]
-    print "v1v2", v1,v2
-    if(np.dot(v1,v2)>=0):
-        return True
-    else:
+# Function to know if we have a CCW turn
+def RightTurn(p1, p2, p3):
+    if (p3[1]-p1[1])*(p2[0]-p1[0]) >= (p2[1]-p1[1])*(p3[0]-p1[0]):
         return False
-    """
+    return True
+    
+# Main algorithm:
+def GrahamScan(P):
+    P.sort()            # Sort the set of points
+    L_upper = [P[0], P[1]]      # Initialize upper part
+    # Compute the upper part of the hull
+    for i in range(2,len(P)):
+        L_upper.append(P[i])
+        while len(L_upper) > 2 and not RightTurn(L_upper[-1],L_upper[-2],L_upper[-3]):
+            del L_upper[-2]
+    L_lower = [P[-1], P[-2]]    # Initialize the lower part
+    # Compute the lower part of the hull
+    for i in range(len(P)-3,-1,-1):
+        L_lower.append(P[i])
+        while len(L_lower) > 2 and not RightTurn(L_lower[-1],L_lower[-2],L_lower[-3]):
+            del L_lower[-2]
+    del L_lower[0]
+    del L_lower[-1]
+    L = L_upper + L_lower       # Build the full hull
+    return np.array(L)
 
-def graham_scan(points_array):
-    points_array = sort_points(points_array)
-    print points_array
-
-    s = [] #push pop size
-    s.append(points_array[-1])
-    s.append(points_array[0])
-    #print s
-    #print "tttte",points_array[1:-1]
-    for point in points_array[1:]:
-        #print point
-        if(toTheLeft(point, s[-1], s[-2])):
-            s.append(point)
-            print s,point
-        else:
-            s.pop()
-            print s,point
-
-    #extract points from stack
-    result = []
-    for i in range(len(s)):
-        result.append(s.pop())
-    if(result[-1]==result[0]):
-        result = result[0:-1]
-    return result[::-1] #reverse list
 
 
 # points_array = [[1,0],[1,1],[0.5,0],[0,1],[0.5,0.5]]
@@ -221,22 +170,22 @@ class Graph:
 
 
 if __name__ == "__main__":
-    plt.plot(start_point[0],start_point[1],'ro')
-    plt.plot(goal_point[0],goal_point[1],'ro')
-    plot_environment(object1)
-    plot_environment(object2)
-    plot_environment(object3)
-    plot_environment(object4)
+    plt.plot(start_point[0],start_point[1],'go')
+    plt.plot(goal_point[0],goal_point[1],'go')
+    #plot_environment(object1)
+    #plot_environment(object2)
+    #plot_environment(object3)
+    #plot_environment(object4)
 
     a = [list(x) for x in grown_obstacle(object1)]
     b = [list(x) for x in grown_obstacle(object2)]
     c = [list(x) for x in grown_obstacle(object3)]
     d = [list(x) for x in grown_obstacle(object4)]
 
-    r1 = graham_scan(a)
-    r2 = graham_scan(b)
-    r3 = graham_scan(c)
-    r4 = graham_scan(d)
+    r1 = GrahamScan(a)
+    r2 = GrahamScan(b)
+    r3 = GrahamScan(c)
+    r4 = GrahamScan(d)
 
     plot_environment(np.array(r1))
     plot_environment(np.array(r2))
