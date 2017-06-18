@@ -3,11 +3,6 @@ import numpy as np
 import heapq
 import math
 
-start_point = [0, 0]
-goal_point = [0, 0]
-dimensions_x = 0
-dimensions_y = 0
-
 
 def plot_environment(object):
     plt.plot(object[:,0],object[:,1],'b-')
@@ -247,13 +242,6 @@ def check_intersect(segment1, segment2):
             A1 = (Y1-Y2) / float(X1-X2)
             b1 = Y1-A1*X1
 
-            # print "X1 ", X1
-            # print "X2 ", X2
-            # print "Y1 ", Y1
-            # print "Y2 ", Y2
-            # print "A1 ", A1
-            # print "b1 ", b1
-
             if X3 <= min(X1, X2) or X3 >= max(X1, X2):
                 return False
             elif A1 * X3 + b1 >= min(Y3, Y4) and A1 * X3 + b1 <= max (Y3, Y4):
@@ -288,10 +276,86 @@ def check_intersect(segment1, segment2):
         return True
 
 
+def createEachGrownObjectEdgesList(graph, graham_scan_result_pts_grouped_by_object_list):
+    ObjectsEdges = []
 
-if __name__ == "__main__":
+    count = 0
 
-    with open("data.txt") as f:
+    for r in graham_scan_result_pts_grouped_by_object_list:
+        for i in range(1, len(r)):
+            ObjectsEdges.append([r[i], r[i - 1]])
+            graph.addUndirectedEdge(count + i, count + i - 1)
+            plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
+
+        ObjectsEdges.append([r[0], r[-1]])
+        graph.addUndirectedEdge(count + len(r) - 1, count)
+        plt.plot([graph.vertices[count + len(r) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r) - 1].y, graph.vertices[count].y], 'y-')
+        count += len(r)
+
+    return ObjectsEdges
+
+
+def connectDiffObjectsWithEdges(graph, graham_scan_result_pts_grouped_by_object_list, ObjectsEdges):
+
+    for i in range(len(graham_scan_result_pts_grouped_by_object_list)):
+        for j in range(i + 1, len(graham_scan_result_pts_grouped_by_object_list)):
+
+            r1 = graham_scan_result_pts_grouped_by_object_list[i]
+            r2 = graham_scan_result_pts_grouped_by_object_list[j]
+
+            for k in range(len(r1)):
+                for l in range(len(r2)):
+
+                    startPt = r1[k]
+                    endPt = r2[l]
+
+                    testEdges = []
+
+                    for e in ObjectsEdges:
+                        if e[0] != startPt and e[1] != startPt and e[0] != endPt and e[1] != endPt:
+                            testEdges.append(e)
+
+
+                    testPass = True
+
+                    for e in testEdges:
+                        if check_intersect([startPt, endPt], e):
+                            testPass = False
+
+                    sIdx = 0
+                    gIdx = 0
+
+                    if testPass:
+                        for idx in range(0, i):
+                            sIdx += len(graham_scan_result_pts_grouped_by_object_list[idx])
+                        sIdx += k
+
+                        for idx in range(0, j):
+                            gIdx += len(graham_scan_result_pts_grouped_by_object_list[idx])
+                        gIdx += l
+
+                        # print " startPt ", startPt, " idx ", sIdx
+                        # print " endPt ", endPt, " idx ", gIdx
+                        # print "testPass ", testPass
+                        # print "i ", i, " j ", j
+
+                        graph.addUndirectedEdge(sIdx, gIdx)
+                        plt.plot([graph.vertices[sIdx].x, graph.vertices[gIdx].x], [graph.vertices[sIdx].y, graph.vertices[gIdx].y], 'y-')
+
+    return graph
+
+
+def generateGraphPts(graham_scan_result_pts_grouped_by_object_list):
+    pts = []
+
+    for r in graham_scan_result_pts_grouped_by_object_list:
+        pts += r
+
+    return pts
+
+
+def parseData(filename):
+    with open(filename) as f:
         content = f.readlines()
 
     content = [x.strip() for x in content]
@@ -326,6 +390,10 @@ if __name__ == "__main__":
     print "objects ", objects
     print "\n"
 
+    return start_point, goal_point, objects, dimensions_x, dimensions_y
+
+
+def graphData(start_point, goal_point, objects):
     plt.plot(start_point[0],start_point[1],'go',ms=10)
     plt.plot(goal_point[0],goal_point[1],'go',ms=10)
 
@@ -333,93 +401,28 @@ if __name__ == "__main__":
         plot_environment(np.array(object))
 
 
+def growAndGrahamScanObjects(objects, start_point, goal_point):
     grown_object_pts_list = []
 
     for object in objects:
         grown_object_pts_list.append([list(x) for x in grown_obstacle(object)])
 
-    r_list = []
+    graham_scan_result_pts_grouped_by_object_list = []
 
     for pts in grown_object_pts_list:
         r = graham_scan(pts)
         plot_grown_obstacle(np.array(r))
-        r_list.append(r)
+        graham_scan_result_pts_grouped_by_object_list.append(r)
 
-    r_list.append([start_point])
-    r_list.append([goal_point])
+    graham_scan_result_pts_grouped_by_object_list.append([start_point])
+    graham_scan_result_pts_grouped_by_object_list.append([goal_point])
 
-    pts = []
-
-    for r in r_list:
-        pts += r
-
-    graph = Graph(pts)
-
-    # # [[[x1, y1], [x2, y2]], [[],[]] ]
-    objectEdges = []
-
-    count = 0
-
-    for r in r_list:
-        for i in range(1, len(r)):
-            objectEdges.append([r[i], r[i - 1]])
-            graph.addUndirectedEdge(count + i, count + i - 1)
-            plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
-
-        objectEdges.append([r[0], r[-1]])
-        graph.addUndirectedEdge(count + len(r) - 1, count)
-        plt.plot([graph.vertices[count + len(r) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r) - 1].y, graph.vertices[count].y], 'y-')
-        count += len(r)
+    return graham_scan_result_pts_grouped_by_object_list
 
 
-    for i in range(len(r_list)):
-        for j in range(i + 1, len(r_list)):
-
-            r1 = r_list[i]
-            r2 = r_list[j]
-
-            for k in range(len(r1)):
-                for l in range(len(r2)):
-
-                    startPt = r1[k]
-                    endPt = r2[l]
-
-                    testEdges = []
-
-                    for e in objectEdges:
-                        if e[0] != startPt and e[1] != startPt and e[0] != endPt and e[1] != endPt:
-                            testEdges.append(e)
-
-
-                    testPass = True
-
-                    for e in testEdges:
-                        if check_intersect([startPt, endPt], e):
-                            testPass = False
-
-                    sIdx = 0
-                    gIdx = 0
-
-                    if testPass:
-                        for idx in range(0, i):
-                            sIdx += len(r_list[idx])
-                        sIdx += k
-
-                        for idx in range(0, j):
-                            gIdx += len(r_list[idx])
-                        gIdx += l
-
-                        # print " startPt ", startPt, " idx ", sIdx
-                        # print " endPt ", endPt, " idx ", gIdx
-                        # print "testPass ", testPass
-                        # print "i ", i, " j ", j
-
-                        graph.addUndirectedEdge(sIdx, gIdx)
-                        plt.plot([graph.vertices[sIdx].x, graph.vertices[gIdx].x], [graph.vertices[sIdx].y, graph.vertices[gIdx].y], 'y-')
-
-
-    graph.dijkstra(len(pts) - 2)
-    result_vertex_indices = graph.shortestPath(len(pts) - 2, len(pts) - 1)
+def getOptimalPathPts(graph):
+    graph.dijkstra(len(graph.vertices) - 2)
+    result_vertex_indices = graph.shortestPath(len(graph.vertices) - 2, len(graph.vertices) - 1)
 
     result = []
 
@@ -428,14 +431,40 @@ if __name__ == "__main__":
 
     print(result)
 
+    return result
+
+
+def plotOptimalPath(result):
     # plot shortest path
     for i in range(1, len(result)):
         plt.plot([result[i - 1][0], result[i][0]], [result[i - 1][1], result[i][1]], 'g-')
 
 
+
+def pathPlanning():
+    start_point, goal_point, objects, dimensions_x, dimensions_y = parseData("data.txt")
+    graphData(start_point, goal_point, objects)
+
+    graham_scan_result_pts_grouped_by_object_list = growAndGrahamScanObjects(objects, start_point, goal_point)
+
+    pts = generateGraphPts(graham_scan_result_pts_grouped_by_object_list)
+    graph = Graph(pts)
+
+    ObjectsEdges = createEachGrownObjectEdgesList(graph, graham_scan_result_pts_grouped_by_object_list)
+    graph = connectDiffObjectsWithEdges(graph, graham_scan_result_pts_grouped_by_object_list, ObjectsEdges)
+
+    result = getOptimalPathPts(graph)
+    plotOptimalPath(result)
+
+
     plt.xlim([0,dimensions_x])
     plt.ylim([0,dimensions_y])
     plt.show()
+
+
+
+if __name__ == "__main__":
+    pathPlanning()
 
 
 
