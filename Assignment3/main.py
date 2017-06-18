@@ -385,25 +385,50 @@ if __name__ == "__main__":
     objectEdges = []
 
 
+    count = 0
+
     for i in range(1, len(r1)):
         objectEdges.append([r1[i], r1[i - 1]])
+        graph.addUndirectedEdge(count + i, count + i - 1)
+        plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
 
     objectEdges.append([r1[0], r1[-1]])
+    graph.addUndirectedEdge(count + len(r1) - 1, count)
+    plt.plot([graph.vertices[count + len(r1) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r1) - 1].y, graph.vertices[count].y], 'y-')
+    count += len(r1)
 
     for i in range(1, len(r2)):
         objectEdges.append([r2[i], r2[i - 1]])
+        graph.addUndirectedEdge(count + i, count + i - 1)
+        plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
 
     objectEdges.append([r2[0], r2[-1]])
+    graph.addUndirectedEdge(count + len(r2) - 1, count)
+    plt.plot([graph.vertices[count + len(r2) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r2) - 1].y, graph.vertices[count].y], 'y-')
+
+    count += len(r2)
 
     for i in range(1, len(r3)):
         objectEdges.append([r3[i], r3[i - 1]])
+        graph.addUndirectedEdge(count + i, count + i - 1)
+        plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
 
     objectEdges.append([r3[0], r3[-1]])
+    graph.addUndirectedEdge(count + len(r3) - 1, count)
+    plt.plot([graph.vertices[count + len(r3) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r3) - 1].y, graph.vertices[count].y], 'y-')
+
+    count += len(r3)
 
     for i in range(1, len(r4)):
         objectEdges.append([r4[i], r4[i - 1]])
+        graph.addUndirectedEdge(count + i, count + i - 1)
+        plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
 
     objectEdges.append([r4[0], r4[-1]])
+    graph.addUndirectedEdge(count + len(r4) - 1, count)
+    plt.plot([graph.vertices[count + len(r4) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r4) - 1].y, graph.vertices[count].y], 'y-')
+
+    count += len(r4)
 
 
 
@@ -451,8 +476,6 @@ if __name__ == "__main__":
 
                         graph.addUndirectedEdge(sIdx, gIdx)
                         plt.plot([graph.vertices[sIdx].x, graph.vertices[gIdx].x], [graph.vertices[sIdx].y, graph.vertices[gIdx].y], 'y-')
-
-
 
 
 
