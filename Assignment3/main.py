@@ -72,21 +72,25 @@ def sort_points(points_array):
 def toTheLeft(a, b, c):
     #s2 is the base
     """test cross-product"""
-
     result = (b[1] - a[1]) *(c[0] - a[0]) - (b[0] - a[0]) * (c[1] - a[1])
-    if(result>=0):
+    if(result>0):
         return True
     return False
-    """
-    print s1,s2
-    v1 = [(s1[0]-s2[0]),(s1[1]-s2[1])]
-    v2 = [(point[0]-s1[0]),(point[1]-s1[1])]
-    print "v1v2", v1,v2
-    if(np.dot(v1,v2)>=0):
-        return True
-    else:
-        return False
-    """
+
+def discard(result):
+    if(find_angle(result[1],result[0]) == find_angle(result[0],result[-1])):
+        result.remove(result[-1])
+    for i in range(1, len(result)-1):
+        pre_an = find_angle(result[i-1], result[i])
+        cur_an = find_angle(result[i], result[i+1])
+        print "result[i]=",result[i]
+        print "angle==========",pre_an, cur_an
+        if(pre_an == cur_an):
+            result.remove(result[i])
+    if(find_angle(result[-2],result[-1]) - find_angle(result[-1],result[0]) < 0.0001):
+        result.remove(result[-1])
+    print "result=====",result
+    return result
 
 def graham_scan(points_array):
     points_array = sort_points(points_array)
@@ -95,28 +99,18 @@ def graham_scan(points_array):
     s = [] #push pop size
     s.append(points_array[-1])
     s.append(points_array[0])
-    #print s
-    #print "tttte",points_array[1:-1]
     for point in points_array[1:]:
         #print point
         while len(s)>1 and toTheLeft(point, s[-1], s[-2])==False:
             s.pop()
         s.append(point)
-        """
-        if(toTheLeft(point, s[-1], s[-2])):
-            s.append(point)
-            print s,point
-        else:
-            s.pop()
-            print s,point
-        """
     #extract points from stack
     result = []
     for i in range(len(s)):
         result.append(s.pop())
-    if(result[-1]==result[0]):
-        result = result[0:-1]
-    return result[::-1] #reverse list
+    #discard redundant points on the same line
+    #result = discard(result)
+    return result
 
 
 
@@ -442,7 +436,7 @@ def plotOptimalPath(result):
 
 
 def pathPlanning():
-    start_point, goal_point, objects, dimensions_x, dimensions_y = parseData("data.txt")
+    start_point, goal_point, objects, dimensions_x, dimensions_y = parseData("test1.txt")
     graphData(start_point, goal_point, objects)
 
     graham_scan_result_pts_grouped_by_object_list = growAndGrahamScanObjects(objects, start_point, goal_point)
