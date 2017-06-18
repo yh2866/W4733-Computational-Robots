@@ -37,11 +37,6 @@ def plot_grown_obstacle(object):
     plt.plot(object[:,0],object[:,1],'ko')
     return
 
-def plot_shortestPath(object):
-    plt.plot(object[:,0],object[:,1],'g-')
-    plt.plot((object[-1,0],object[0,0]),(object[-1,1],object[0,1]),'g-')
-    return
-
 def grown_obstacle(object):
     l = len(object)
     grown_obstacle = np.zeros((4*l,2))
@@ -195,18 +190,20 @@ class Graph:
 
         while pq:
             cost, vId, backpointer = heapq.heappop(pq)
-            # print("v x ", self.vertices[vId].x)
-            # print("v y ", self.vertices[vId].y)
+
             if not self.vertices[vId].visited:
-                self.vertices[vId].visted = True
+                if backpointer != None :
+                    print "cost ", cost, " vId", vId, " loc ", self.vertices[vId].x, ", ", self.vertices[vId].y, " backpointer ", backpointer, " loc ", self.vertices[backpointer].x, ", ", self.vertices[backpointer].y
+                self.vertices[vId].visited = True
                 self.vertices[vId].cost = cost
                 self.vertices[vId].backpointer = backpointer
 
-                for e in self.vertices[vId].adj:
 
-                    if self.vertices[vId].cost + e.cost < self.vertices[e.targetVId].cost:
-                        cost = self.vertices[vId].cost + e.cost
-                        heapq.heappush(pq, (cost, e.targetVId, vId))
+                for e in self.vertices[vId].adj:
+                    if not self.vertices[e.targetVId].visited:
+                        if self.vertices[vId].cost + e.cost < self.vertices[e.targetVId].cost:
+                            cost = self.vertices[vId].cost + e.cost
+                            heapq.heappush(pq, (cost, e.targetVId, vId))
 
 
 
@@ -261,18 +258,18 @@ def check_intersect(segment1, segment2):
                 return False
 
         elif X3 == X4:
-            print "x3 == x4"
-            print "Y1 - Y2 ", Y1 - Y2
-            print "X1 - X2 ", X1 - X2
+            # print "x3 == x4"
+            # print "Y1 - Y2 ", Y1 - Y2
+            # print "X1 - X2 ", X1 - X2
             A1 = (Y1-Y2) / float(X1-X2)
             b1 = Y1-A1*X1
 
-            print "X1 ", X1
-            print "X2 ", X2
-            print "Y1 ", Y1
-            print "Y2 ", Y2
-            print "A1 ", A1
-            print "b1 ", b1
+            # print "X1 ", X1
+            # print "X2 ", X2
+            # print "Y1 ", Y1
+            # print "Y2 ", Y2
+            # print "A1 ", A1
+            # print "b1 ", b1
 
             if X3 <= min(X1, X2) or X3 >= max(X1, X2):
                 return False
@@ -352,167 +349,127 @@ def detect_intersect(segment1, segment2):
 if __name__ == "__main__":
     plt.plot(start_point[0],start_point[1],'go',ms=10)
     plt.plot(goal_point[0],goal_point[1],'go',ms=10)
-    # plot_environment(object1)
+    plot_environment(object1)
     plot_environment(object2)
-    # plot_environment(object3)
-    # plot_environment(object4)
+    plot_environment(object3)
+    plot_environment(object4)
 
-    # a = [list(x) for x in grown_obstacle(object1)]
+    a = [list(x) for x in grown_obstacle(object1)]
     b = [list(x) for x in grown_obstacle(object2)]
-    # c = [list(x) for x in grown_obstacle(object3)]
-    # d = [list(x) for x in grown_obstacle(object4)]
+    c = [list(x) for x in grown_obstacle(object3)]
+    d = [list(x) for x in grown_obstacle(object4)]
 
-    # r1 = graham_scan(a)
+    r1 = graham_scan(a)
     r2 = graham_scan(b)
-    # r3 = graham_scan(c)
-    # r4 = graham_scan(d)
+    r3 = graham_scan(c)
+    r4 = graham_scan(d)
 
 
-    # plot_grown_obstacle(np.array(r1))
+    plot_grown_obstacle(np.array(r1))
     plot_grown_obstacle(np.array(r2))
-    # plot_grown_obstacle(np.array(r3))
-    # plot_grown_obstacle(np.array(r4))
+    plot_grown_obstacle(np.array(r3))
+    plot_grown_obstacle(np.array(r4))
 
-    r = r2
-    # print "r len", len(r)
+    r_list = []
+    r_list.append(r1)
+    r_list.append(r2)
+    r_list.append(r3)
+    r_list.append(r4)
+    r_list.append([start_point])
+    r_list.append([goal_point])
 
-    pts = [start_point] + r + [goal_point]
-    graph = Graph(pts)
+    r = r1 + r2 + r3 + r4 + [start_point] + [goal_point]
+    graph = Graph(r1 + r2 + r3 + r4 + [start_point] + [goal_point])
 
     # [[[x1, y1], [x2, y2]], [[],[]] ]
     objectEdges = []
 
 
-    # for i in range(1, len(r1)):
-    #     objectEdges.append([r1[i], r1[i - 1]])
+    for i in range(1, len(r1)):
+        objectEdges.append([r1[i], r1[i - 1]])
 
-    # objectEdges.append([r1[0], r1[-1]])
+    objectEdges.append([r1[0], r1[-1]])
 
     for i in range(1, len(r2)):
         objectEdges.append([r2[i], r2[i - 1]])
 
     objectEdges.append([r2[0], r2[-1]])
 
-    # for i in range(1, len(r3)):
-    #     objectEdges.append([r3[i], r3[i - 1]])
+    for i in range(1, len(r3)):
+        objectEdges.append([r3[i], r3[i - 1]])
 
-    # objectEdges.append([r3[0], r3[-1]])
+    objectEdges.append([r3[0], r3[-1]])
 
-    # for i in range(1, len(r4)):
-    #     objectEdges.append([r4[i], r4[i - 1]])
+    for i in range(1, len(r4)):
+        objectEdges.append([r4[i], r4[i - 1]])
 
-    # objectEdges.append([r4[0], r4[-1]])
-
-
-
-    # for i in range(len(r)):
-
-    #     for j in range(i + 1, len(r)):
-    #         testEdges = []
-    #         for e in objectEdges:
-    #             if e[0] != r[i] and e[1] != r[i] and e[0] != r[j] and e[1] != r[j]:
-    #                 testEdges.append(e)
-
-    #         print "ri ", r[i]
-    #         print "rj ", r[j]
-
-    #         # print "testEdges ", testEdges
-
-    #         testPass = True
-
-    #         for e in testEdges:
-    #             if check_intersect([r[i], r[j]], e):
-    #                 testPass = False
-
-    #         if testPass:
-    #             graph.addUndirectedEdge(i, j)
-    #             plt.plot([graph.vertices[i].x, graph.vertices[j].x], [graph.vertices[i].y, graph.vertices[j].y], 'y-')
-    #         print "testPass ", testPass
+    objectEdges.append([r4[0], r4[-1]])
 
 
-    # print "start adj endges"
-    # for e in graph.vertices[0].adj:
-    #     print "x ", graph.vertices[e.targetVId].x
-    #     print "y ", graph.vertices[e.targetVId].y
+
+    for i in range(len(r_list)):
+        for j in range(i + 1, len(r_list)):
+
+            r1 = r_list[i]
+            r2 = r_list[j]
 
 
-    # print "test edge case ", check_intersect([goal_point, [145.35287801000001, 194.640170509]], [[107.0, 157.0], [107.0, 180.0]])
+            for k in range(len(r1)):
+                for l in range(len(r2)):
 
-    goalIdx = len(pts) - 1
+                    startPt = r1[k]
+                    endPt = r2[l]
 
-    for j in range(len(r)):
-        testEdges = []
+                    testEdges = []
 
-        for e in objectEdges:
-            # print "e ", e
-
-            # e = [[starx, starty], [endx, endy]]
-            if e[0] != pts[goalIdx] and e[1] != pts[goalIdx] and e[0] != r[j] and e[1] != r[j]:
-                testEdges.append(e)
-
-        print "start point ", pts[i]
-        print "rj ", r[j]
-        print "testEdges ", testEdges
-        print "testEges len ", len(testEdges)
-
-        testPass = True
-
-        for e in testEdges:
-            if check_intersect([pts[goalIdx], r[j]], e):
-                if r[j] == [145.35287801000001, 194.640170509]:
-                    print "145 e ", e
-                testPass = False
-
-        if testPass:
-            graph.addUndirectedEdge(goalIdx, j + 1)
-            plt.plot([graph.vertices[goalIdx].x, graph.vertices[j + 1].x], [graph.vertices[goalIdx].y, graph.vertices[j + 1].y], 'y-')
-
-        print "testPass ", testPass
+                    for e in objectEdges:
+                        if e[0] != startPt and e[1] != startPt and e[0] != endPt and e[1] != endPt:
+                            testEdges.append(e)
 
 
-    goalIdx = 0
+                    testPass = True
 
-    for j in range(len(r)):
-        testEdges = []
+                    for e in testEdges:
+                        if check_intersect([startPt, endPt], e):
+                            testPass = False
 
-        for e in objectEdges:
-            # print "e ", e
+                    sIdx = 0
+                    gIdx = 0
 
-            # e = [[starx, starty], [endx, endy]]
-            if e[0] != pts[goalIdx] and e[1] != pts[goalIdx] and e[0] != r[j] and e[1] != r[j]:
-                testEdges.append(e)
+                    if testPass:
+                        for idx in range(0, i):
+                            sIdx += len(r_list[idx])
+                        sIdx += k
 
-        print "start point ", pts[goalIdx]
-        print "rj ", r[j]
-        print "testEdges ", testEdges
-        print "testEges len ", len(testEdges)
+                        for idx in range(0, j):
+                            gIdx += len(r_list[idx])
+                        gIdx += l
 
-        testPass = True
+                        # print " startPt ", startPt, " idx ", sIdx
+                        # print " endPt ", endPt, " idx ", gIdx
+                        # print "testPass ", testPass
+                        # print "i ", i, " j ", j
 
-        for e in testEdges:
-            if check_intersect([pts[goalIdx], r[j]], e):
-                if r[j] == [145.35287801000001, 194.640170509]:
-                    print "145 e ", e
-                testPass = False
-
-        if testPass:
-            graph.addUndirectedEdge(goalIdx, j + 1)
-            plt.plot([graph.vertices[goalIdx].x, graph.vertices[j + 1].x], [graph.vertices[goalIdx].y, graph.vertices[j + 1].y], 'y-')
-
-        print "testPass ", testPass
+                        graph.addUndirectedEdge(sIdx, gIdx)
+                        plt.plot([graph.vertices[sIdx].x, graph.vertices[gIdx].x], [graph.vertices[sIdx].y, graph.vertices[gIdx].y], 'y-')
 
 
-    # graph.dijkstra(0)
-    # result_vertex_indices = graph.shortestPath(0, len(r) - 1)
 
-    # result = []
 
-    # for i in result_vertex_indices:
-    #     result.append([graph.vertices[i].x, graph.vertices[i].y])
 
-    # print(result)
+    graph.dijkstra(len(r) - 2)
+    result_vertex_indices = graph.shortestPath(len(r) - 2, len(r) - 1)
 
-    # plot_shortestPath(np.array(result))
+    result = []
+
+    for i in result_vertex_indices:
+        result.append([graph.vertices[i].x, graph.vertices[i].y])
+
+    print(result)
+
+    for i in range(1, len(result)):
+        plt.plot([result[i - 1][0], result[i][0]], [result[i - 1][1], result[i][1]], 'g-')
+
 
     plt.xlim([0,dimensions_x])
     plt.ylim([0,dimensions_y])
