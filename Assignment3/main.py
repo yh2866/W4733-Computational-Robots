@@ -109,7 +109,7 @@ def graham_scan(points_array):
     for i in range(len(s)):
         result.append(s.pop())
     #discard redundant points on the same line
-    #result = discard(result)
+    result = discard(result)
     return result
 
 
