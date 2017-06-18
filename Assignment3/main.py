@@ -21,12 +21,12 @@ def grown_obstacle(object):
     for i in xrange(l):
         grown_obstacle[0*l+i][0] = object[i][0]
         grown_obstacle[0*l+i][1] = object[i][1]
-        grown_obstacle[1*l+i][0] = object[i][0]-23
-        grown_obstacle[1*l+i][1] = object[i][1]-23
-        grown_obstacle[2*l+i][0] = object[i][0]-23
+        grown_obstacle[1*l+i][0] = object[i][0]+23
+        grown_obstacle[1*l+i][1] = object[i][1]+23
+        grown_obstacle[2*l+i][0] = object[i][0]+23
         grown_obstacle[2*l+i][1] = object[i][1]
         grown_obstacle[3*l+i][0] = object[i][0]
-        grown_obstacle[3*l+i][1] = object[i][1]-23
+        grown_obstacle[3*l+i][1] = object[i][1]+23
         #plt.plot(grown_obstacle[:,0],grown_obstacle[:,1],'ko')
     return grown_obstacle
 
