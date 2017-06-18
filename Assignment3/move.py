@@ -140,40 +140,94 @@ def update_pos(theta_change, X_change, Y_change):
         print "Y", Y
 
 
-def isGoal(X_GOAL, Y_GOAL, X, Y):
-    return abs(X - X_GOAL) <= ERROR_goal and abs(Y - Y_GOAL) <= ERROR_goal
+# def isGoal(X_GOAL, Y_GOAL, X, Y):
+#     return abs(X - X_GOAL) <= ERROR_goal and abs(Y - Y_GOAL) <= ERROR_goal
 
-def orient_to_goal():
-    scale = 1.2
-    if X_GOAL != 0 and Y_GOAL > 0:
-        print '(Y_GOAL/ X_GOAL) / 3.14 * 180',np.arctan((Y_GOAL/ X_GOAL) / 3.14 * 180)
-        left_angle = np.arctan((Y_GOAL/ X_GOAL)) / 3.14 * 180
-        left_deg(left_angle*scale)
-        print 'left_angle', left_angle
-        update_pos(left_angle,0,0)
-    elif X_GOAL != 0 and Y_GOAL < 0:
-        right_angle = np.arctan(-(Y_GOAL/ X_GOAL)) / 3.14 * 180
-        right_deg(right_angle)
-        update_pos(-right_angle,0,0)
-    elif X_GOAL == 0 and Y_GOAL < 0:
-        right_deg(90)
-        update_pos(-90,0,0)
-    elif X_GOAL == 0 and Y_GOAL > 0:
-        left_deg(90)
-        update_pos(90,0,0)
+# def orient_to_goal():
+#     scale = 1.2
+#     if X_GOAL != 0 and Y_GOAL > 0:
+#         print '(Y_GOAL/ X_GOAL) / 3.14 * 180',np.arctan((Y_GOAL/ X_GOAL) / 3.14 * 180)
+#         left_angle = np.arctan((Y_GOAL/ X_GOAL)) / 3.14 * 180
+#         left_deg(left_angle*scale)
+#         print 'left_angle', left_angle
+#         update_pos(left_angle,0,0)
+#     elif X_GOAL != 0 and Y_GOAL < 0:
+#         right_angle = np.arctan(-(Y_GOAL/ X_GOAL)) / 3.14 * 180
+#         right_deg(right_angle)
+#         update_pos(-right_angle,0,0)
+#     elif X_GOAL == 0 and Y_GOAL < 0:
+#         right_deg(90)
+#         update_pos(-90,0,0)
+#     elif X_GOAL == 0 and Y_GOAL > 0:
+#         left_deg(90)
+#         update_pos(90,0,0)
 
 def move_to_next(position1, position2):
+    global theta
     scale = 1.2
-    if X_GOAL != 0 and Y_GOAL > 0:
-        print '(Y_GOAL/ X_GOAL) / 3.14 * 180',np.arctan((Y_GOAL/ X_GOAL) / 3.14 * 180)
-        left_angle = np.arctan((Y_GOAL/ X_GOAL)) / 3.14 * 180
-        left_deg(left_angle*scale)
-        print 'left_angle', left_angle
-        update_pos(left_angle,0,0)
+    x_diff = position2[0] - position1[0]
+    y_diff = position2[1] - position1[1]
+    move_dis = np.sqrt(x_diff**2 + y_diff**2)
+    # if x_diff > 0:
+    #     if y_diff > 0:
+    #         left_angle = np.arctan((y_diff/ x_diff)) / 3.14 * 180
+    #         left_deg(left_angle*scale)
+    #         print 'left_angle', left_angle
+    #         update_pos(left_angle,0,0)
+    #     elif y_diff < 0:
+    #         right_angle = np.arctan((y_diff/ x_diff)) / 3.14 * 180
+    #         right_deg(abs(right_angle*scale))
+    #         print 'left_angle', left_angle
+    #         update_pos(right_angle,0,0)
+    #     else:
+    #         print 'not turn'
+    # if x_diff < 0:
+    #     if y_diff > 0:
+    #         left_angle = np.arctan((y_diff/ x_diff)) / 3.14 * 180
+    #         left_deg(left_angle*scale)
+    #         print 'left_angle', left_angle
+    #         update_pos(left_angle,0,0)
+    #     elif y_diff < 0:
+    #         right_angle = np.arctan((y_diff/ x_diff)) / 3.14 * 180
+    #         right_deg(abs(right_angle*scale))
+    #         print 'left_angle', left_angle
+    #         update_pos(right_angle,0,0)
+    #     else:
+    #         print 'not turn'
+    if x_diff != 0:
+        if x_diff > 0 and y_diff >=0: #Phase 1
+            angle_goal = np.arctan((y_diff/ x_diff)) / 3.14 * 180
+        if x_diff < 0 and y_diff >=0: #Phase 2
+            angle_goal = 180 + np.arctan((y_diff/ x_diff)) / 3.14 * 180
+        if x_diff < 0 and y_diff < 0: #Phase 3
+            angle_goal = 180 + np.arctan((y_diff/ x_diff)) / 3.14 * 180
+        if x_diff > 0 and y_diff < 0: #Phase 4
+            angle_goal = 360 + np.arctan((y_diff/ x_diff)) / 3.14 * 180
+    else:
+        if y_diff > 0:
+            angle_goal = 90
+        elif y_diff < 0:
+            angle_goal = 270
+
+    angle_diff = angle_goal - theta
+    if angle_diff>0:
+        left_deg(angle_diff*scale)
+        update_pos(angle_diff,0,0)
+    elif angle_diff<0:
+        right_deg(-angle_diff*scale)
+        update_pos(angle_diff,0,0)
+    time.sleep(3)
+    fwd_cm(move_dis)
+    update_pos(0,move_dis,0)
+    time.sleep(5)
+
+
+
+
+
+
     
 
 if __name__ == '__main__':
     set_speed(100)
-    orient_to_goal()
-    time.sleep(3)
-    fwd_cm(20)
+    move_to_next([0,0],[10,10])
