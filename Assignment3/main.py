@@ -3,27 +3,10 @@ import numpy as np
 import heapq
 import math
 
-start_point = [10,20]
-goal_point = [250,250]
-dimensions_x = 300
-dimensions_y = 300
-
-object1 = np.array([[200, 220],
-                    [221.213203436, 241.213203436],
-                    [210.606601718, 251.819805153],
-                    [189.393398282, 230.606601718]])
-
-object2 = np.array([[130, 180],
-                    [159.997181494, 179.588779362],
-                    [145.35287801, 194.640170509]])
-
-object3 = np.array([[150, 120],
-                    [194.995772241, 119.383169043],
-                    [173.029317014, 141.960255763]])
-
-object4 = np.array([[230, 170],
-                    [251.501987353, 190.920433549],
-                    [230.503960307, 191.208287996]])
+start_point = [0, 0]
+goal_point = [0, 0]
+dimensions_x = 0
+dimensions_y = 0
 
 
 def plot_environment(object):
@@ -279,6 +262,7 @@ def check_intersect(segment1, segment2):
                 return False
 
 
+    # got this portion from stackoverflow
 
     a1 = (Y1-Y2)/(X1-X2)
     a2 = (Y3-Y4)/(X3-X4)
@@ -304,132 +288,88 @@ def check_intersect(segment1, segment2):
         return True
 
 
-def detect_intersect(segment1, segment2):
-    x1 = segment1[0][0]
-    x2 = segment1[1][0]
-    y1 = segment1[0][1]
-    y2 = segment1[1][1]
-    x3 = segment2[0][0]
-    x4 = segment2[1][0]
-    y3 = segment2[0][1]
-    y4 = segment2[1][1]
-
-    a1 = 0
-    a2 = 0
-
-    if x1!=x2 and x3!=x4:
-        a1 = (y1-y2)/(x1-x2)
-        a2 = (y3-y4)/(x3-x4)
-    elif x1==x2:
-        a1 = 10000;
-    elif x3==x4:
-        a2 = 10000;
-    b1 = -1;
-    b2 = -1;
-    c1 = y1 - a1*x1;
-    c2 = y3 - a2*x3;
-    #using the sign function from numpy
-    f1_1 = np.sign(a1*x3 + b1*y3 + c1);
-    f1_2 = np.sign(a1*x4 + b1*y4 + c1);
-    f2_1 = np.sign(a2*x1 + b2*y1 + c2);
-    f2_2 = np.sign(a2*x2 + b2*y2 + c2);
-    # print "f1_1",f1_1
-    # print "f1_2",f1_2
-    # print "f2_1",f2_1
-    # print "f2_2",f2_2
-
-    if (f1_1 == f1_2) or (f2_1 == f2_2):
-        # print "Not intersect"
-        return False
-    if (f1_1 != f1_2) and (f2_1 != f2_2):
-        # print "Intersect"
-        return True
-
 
 if __name__ == "__main__":
+
+    with open("data.txt") as f:
+        content = f.readlines()
+
+    content = [x.strip() for x in content]
+    print(content)
+
+    startx, starty = map(float, content[0].split())
+    start_point = [startx, starty]
+
+    goalx, goaly = map(float, content[1].split())
+    goal_point = [goalx, goaly]
+
+    dimensions_x, dimensions_y = map(float, content[2].split())
+
+    numObj = int(content[3])
+
+    contentIdx = 4
+    objects = []
+
+    for i in range(numObj):
+        object = []
+
+        vertices = int(content[contentIdx])
+        contentIdx += 1
+
+        for j in range(vertices):
+            x, y = map(float, content[contentIdx].split())
+            object.append([x, y])
+            contentIdx += 1
+
+        objects.append(object)
+
+    print "objects ", objects
+    print "\n"
+
     plt.plot(start_point[0],start_point[1],'go',ms=10)
     plt.plot(goal_point[0],goal_point[1],'go',ms=10)
-    plot_environment(object1)
-    plot_environment(object2)
-    plot_environment(object3)
-    plot_environment(object4)
 
-    a = [list(x) for x in grown_obstacle(object1)]
-    b = [list(x) for x in grown_obstacle(object2)]
-    c = [list(x) for x in grown_obstacle(object3)]
-    d = [list(x) for x in grown_obstacle(object4)]
-
-    r1 = graham_scan(a)
-    r2 = graham_scan(b)
-    r3 = graham_scan(c)
-    r4 = graham_scan(d)
+    for object in objects:
+        plot_environment(np.array(object))
 
 
-    plot_grown_obstacle(np.array(r1))
-    plot_grown_obstacle(np.array(r2))
-    plot_grown_obstacle(np.array(r3))
-    plot_grown_obstacle(np.array(r4))
+    grown_object_pts_list = []
+
+    for object in objects:
+        grown_object_pts_list.append([list(x) for x in grown_obstacle(object)])
 
     r_list = []
-    r_list.append(r1)
-    r_list.append(r2)
-    r_list.append(r3)
-    r_list.append(r4)
+
+    for pts in grown_object_pts_list:
+        r = graham_scan(pts)
+        plot_grown_obstacle(np.array(r))
+        r_list.append(r)
+
     r_list.append([start_point])
     r_list.append([goal_point])
 
-    r = r1 + r2 + r3 + r4 + [start_point] + [goal_point]
-    graph = Graph(r1 + r2 + r3 + r4 + [start_point] + [goal_point])
+    pts = []
 
-    # [[[x1, y1], [x2, y2]], [[],[]] ]
+    for r in r_list:
+        pts += r
+
+    graph = Graph(pts)
+
+    # # [[[x1, y1], [x2, y2]], [[],[]] ]
     objectEdges = []
-
 
     count = 0
 
-    for i in range(1, len(r1)):
-        objectEdges.append([r1[i], r1[i - 1]])
-        graph.addUndirectedEdge(count + i, count + i - 1)
-        plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
+    for r in r_list:
+        for i in range(1, len(r)):
+            objectEdges.append([r[i], r[i - 1]])
+            graph.addUndirectedEdge(count + i, count + i - 1)
+            plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
 
-    objectEdges.append([r1[0], r1[-1]])
-    graph.addUndirectedEdge(count + len(r1) - 1, count)
-    plt.plot([graph.vertices[count + len(r1) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r1) - 1].y, graph.vertices[count].y], 'y-')
-    count += len(r1)
-
-    for i in range(1, len(r2)):
-        objectEdges.append([r2[i], r2[i - 1]])
-        graph.addUndirectedEdge(count + i, count + i - 1)
-        plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
-
-    objectEdges.append([r2[0], r2[-1]])
-    graph.addUndirectedEdge(count + len(r2) - 1, count)
-    plt.plot([graph.vertices[count + len(r2) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r2) - 1].y, graph.vertices[count].y], 'y-')
-
-    count += len(r2)
-
-    for i in range(1, len(r3)):
-        objectEdges.append([r3[i], r3[i - 1]])
-        graph.addUndirectedEdge(count + i, count + i - 1)
-        plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
-
-    objectEdges.append([r3[0], r3[-1]])
-    graph.addUndirectedEdge(count + len(r3) - 1, count)
-    plt.plot([graph.vertices[count + len(r3) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r3) - 1].y, graph.vertices[count].y], 'y-')
-
-    count += len(r3)
-
-    for i in range(1, len(r4)):
-        objectEdges.append([r4[i], r4[i - 1]])
-        graph.addUndirectedEdge(count + i, count + i - 1)
-        plt.plot([graph.vertices[count + i].x, graph.vertices[count + i - 1].x], [graph.vertices[count + i].y, graph.vertices[count + i - 1].y], 'y-')
-
-    objectEdges.append([r4[0], r4[-1]])
-    graph.addUndirectedEdge(count + len(r4) - 1, count)
-    plt.plot([graph.vertices[count + len(r4) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r4) - 1].y, graph.vertices[count].y], 'y-')
-
-    count += len(r4)
-
+        objectEdges.append([r[0], r[-1]])
+        graph.addUndirectedEdge(count + len(r) - 1, count)
+        plt.plot([graph.vertices[count + len(r) - 1].x, graph.vertices[count].x], [graph.vertices[count + len(r) - 1].y, graph.vertices[count].y], 'y-')
+        count += len(r)
 
 
     for i in range(len(r_list)):
@@ -478,9 +418,8 @@ if __name__ == "__main__":
                         plt.plot([graph.vertices[sIdx].x, graph.vertices[gIdx].x], [graph.vertices[sIdx].y, graph.vertices[gIdx].y], 'y-')
 
 
-
-    graph.dijkstra(len(r) - 2)
-    result_vertex_indices = graph.shortestPath(len(r) - 2, len(r) - 1)
+    graph.dijkstra(len(pts) - 2)
+    result_vertex_indices = graph.shortestPath(len(pts) - 2, len(pts) - 1)
 
     result = []
 
