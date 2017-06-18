@@ -413,7 +413,6 @@ if __name__ == "__main__":
             r1 = r_list[i]
             r2 = r_list[j]
 
-
             for k in range(len(r1)):
                 for l in range(len(r2)):
 
@@ -467,6 +466,7 @@ if __name__ == "__main__":
 
     print(result)
 
+    # plot shortest path
     for i in range(1, len(result)):
         plt.plot([result[i - 1][0], result[i][0]], [result[i - 1][1], result[i][1]], 'g-')
 
