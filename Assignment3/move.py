@@ -42,6 +42,7 @@ def left_deg(deg=None):
     This function sets the encoder to the correct number
      of pulses and then invokes left().
     '''
+    set_speed(100)
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(0,1,pulse)
@@ -55,6 +56,7 @@ def right_deg(deg=None):
     This function sets the encoder to the correct number
      of pulses and then invokes right().
     '''
+    set_speed(100)
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(1,0,pulse)
@@ -96,6 +98,7 @@ def cm2pulse(dist):
 
 
 def fwd_cm(dist=None):
+    set_speed(200)
     if dist is not None:
         pulse = int(cm2pulse(dist))
         enc_tgt(1,1,pulse)
@@ -139,61 +142,13 @@ def update_pos(theta_change, X_change, Y_change):
         print "X", X
         print "Y", Y
 
-
-# def isGoal(X_GOAL, Y_GOAL, X, Y):
-#     return abs(X - X_GOAL) <= ERROR_goal and abs(Y - Y_GOAL) <= ERROR_goal
-
-# def orient_to_goal():
-#     scale = 1.2
-#     if X_GOAL != 0 and Y_GOAL > 0:
-#         print '(Y_GOAL/ X_GOAL) / 3.14 * 180',np.arctan((Y_GOAL/ X_GOAL) / 3.14 * 180)
-#         left_angle = np.arctan((Y_GOAL/ X_GOAL)) / 3.14 * 180
-#         left_deg(left_angle*scale)
-#         print 'left_angle', left_angle
-#         update_pos(left_angle,0,0)
-#     elif X_GOAL != 0 and Y_GOAL < 0:
-#         right_angle = np.arctan(-(Y_GOAL/ X_GOAL)) / 3.14 * 180
-#         right_deg(right_angle)
-#         update_pos(-right_angle,0,0)
-#     elif X_GOAL == 0 and Y_GOAL < 0:
-#         right_deg(90)
-#         update_pos(-90,0,0)
-#     elif X_GOAL == 0 and Y_GOAL > 0:
-#         left_deg(90)
-#         update_pos(90,0,0)
-
 def move_to_next(position1, position2):
     global theta
-    scale = 1.2
+    scale = 1.0
     x_diff = position2[0] - position1[0]
     y_diff = position2[1] - position1[1]
     move_dis = np.sqrt(x_diff**2 + y_diff**2)
-    # if x_diff > 0:
-    #     if y_diff > 0:
-    #         left_angle = np.arctan((y_diff/ x_diff)) / 3.14 * 180
-    #         left_deg(left_angle*scale)
-    #         print 'left_angle', left_angle
-    #         update_pos(left_angle,0,0)
-    #     elif y_diff < 0:
-    #         right_angle = np.arctan((y_diff/ x_diff)) / 3.14 * 180
-    #         right_deg(abs(right_angle*scale))
-    #         print 'left_angle', left_angle
-    #         update_pos(right_angle,0,0)
-    #     else:
-    #         print 'not turn'
-    # if x_diff < 0:
-    #     if y_diff > 0:
-    #         left_angle = np.arctan((y_diff/ x_diff)) / 3.14 * 180
-    #         left_deg(left_angle*scale)
-    #         print 'left_angle', left_angle
-    #         update_pos(left_angle,0,0)
-    #     elif y_diff < 0:
-    #         right_angle = np.arctan((y_diff/ x_diff)) / 3.14 * 180
-    #         right_deg(abs(right_angle*scale))
-    #         print 'left_angle', left_angle
-    #         update_pos(right_angle,0,0)
-    #     else:
-    #         print 'not turn'
+ 
     if x_diff != 0:
         if x_diff > 0 and y_diff >=0: #Phase 1
             angle_goal = np.arctan((y_diff/ x_diff)) / 3.14 * 180
@@ -210,16 +165,19 @@ def move_to_next(position1, position2):
             angle_goal = 270
 
     angle_diff = angle_goal - theta
+    if angle_diff>360:
+        angle_diff = angle_diff - 360
+        
     if angle_diff>0:
         left_deg(angle_diff*scale)
         update_pos(angle_diff,0,0)
     elif angle_diff<0:
         right_deg(-angle_diff*scale)
         update_pos(angle_diff,0,0)
-    time.sleep(3)
+    time.sleep(abs(angle_diff)/30.)
     fwd_cm(move_dis)
     update_pos(0,move_dis,0)
-    time.sleep(5)
+    time.sleep(move_dis/10.)
 
 
 
@@ -229,5 +187,9 @@ def move_to_next(position1, position2):
     
 
 if __name__ == '__main__':
+    path = [[0.,0.], [30.,0.],[30.,30.], [45., 80.], [60., 60.], [120.,0.]]
     set_speed(100)
-    move_to_next([0,0],[10,10])
+    for i in xrange(len(path)-1):
+        print 'path[i]',path[i]
+        print 'path[i+1]',path[i+1]
+        move_to_next(path[i],path[i+1])
