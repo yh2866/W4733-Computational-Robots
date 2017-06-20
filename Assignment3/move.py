@@ -1,7 +1,7 @@
 from gopigo import *
 import time
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import sys
 
 en_debug = 1
@@ -42,9 +42,10 @@ def left_deg(deg=None):
     This function sets the encoder to the correct number
      of pulses and then invokes left().
     '''
+    deg = deg * 1.1
     set_speed(150)
     if deg <50:
-        set_speed(150)
+        set_speed(135)
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(0,1,pulse)
@@ -58,9 +59,10 @@ def right_deg(deg=None):
     This function sets the encoder to the correct number
      of pulses and then invokes right().
     '''
+    deg = deg * 1.3
     set_speed(150)
     if deg <50:
-        set_speed(150)
+        set_speed(135)
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(1,0,pulse)
@@ -94,10 +96,6 @@ def cm2pulse(dist):
     revs = dist/wheel_circ
     PPR = 18 # [p/rev] encoder Pulses Per wheel Revolution
     pulses = PPR*revs # [p] encoder pulses required to move dist cm.
-    if en_debug:
-        print 'WHEEL_RAD',WHEEL_RAD
-        print 'revs',revs
-        print 'pulses',pulses
     return pulses
 
 
@@ -176,27 +174,18 @@ def move_to_next(position1, position2):
 
     if angle_diff>180:
         right_deg(360 - angle_diff*scale)
+        print "Turh right:", 360 - angle_diff*scale
         update_pos(-(360 - angle_diff*scale),0,0)
+        time.sleep(abs(360 - angle_diff*scale)/20.)
     elif angle_diff>0.1:
         left_deg(angle_diff*scale)
+        print "Turn left:", angle_diff*scale
         update_pos(angle_diff,0,0)
-    #if angle_diff>0:
-        #left_deg(angle_diff*scale)
-        #update_pos(angle_diff,0,0)
-    #elif angle_diff<0:
-        #right_deg(-angle_diff*scale)
-        #update_pos(angle_diff,0,0)
-    #if angle_diff < 0:
-    #    
-    #if angle_diff>180:
-    #    right_deg(360 - angle_diff*scale)
-    #elif angle_diff<=180:
-    #    left_deg(angle_diff*scale)
-    time.sleep(abs(angle_diff)/30.)
-    fwd_cm(move_dis*0.9)
+        time.sleep(abs(angle_diff*scale)/20.)
+    fwd_cm(move_dis)
     print "move_dis\n\n\n",move_dis
     update_pos(0,move_dis,0)
-    time.sleep(move_dis/10.)
+    time.sleep(move_dis/20.)
 
 
 
@@ -206,7 +195,7 @@ def move_to_next(position1, position2):
     
 
 if __name__ == '__main__':
-    path = [[0.,0.], [60.,20.],[88.,150.], [102., 289.], [144., 325.], [147., 420.]]#, [447.,0.]]
+    path = [[60.,20.],[88.,150.], [102., 289.], [144., 325.], [147., 420.]]#, [447.,0.]]
     set_speed(100)
     for i in xrange(len(path)-1):
         print 'path[i]',path[i]

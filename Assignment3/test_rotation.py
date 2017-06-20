@@ -52,10 +52,12 @@ def fwd_cm(dist=None):
 
 
 if __name__ == "__main__":
-    for i in xrange(8):
+    for i in xrange(4):
         set_speed(150)
         #fwd_cm(100*0.98)
-        
-        right_deg(45*1.0)
+        left_deg(90)
+        #left_deg(77.88)
         time.sleep(3)
+        #fwd_cm(133)
+        #time.sleep(6)
     
