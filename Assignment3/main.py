@@ -436,7 +436,7 @@ def plotOptimalPath(result):
 
 
 def pathPlanning():
-    start_point, goal_point, objects, dimensions_x, dimensions_y = parseData("test1.txt")
+    start_point, goal_point, objects, dimensions_x, dimensions_y = parseData("ROBORACE.txt")
     graphData(start_point, goal_point, objects)
 
     graham_scan_result_pts_grouped_by_object_list = growAndGrahamScanObjects(objects, start_point, goal_point)

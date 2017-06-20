@@ -206,7 +206,7 @@ def move_to_next(position1, position2):
     
 
 if __name__ == '__main__':
-    path = [[0.,0.], [100.,-100.],[200.,0.], [300., 0.], [400., 0.]]#, [447.,0.]]
+    path = [[0.,0.], [60.,20.],[88.,150.], [102., 289.], [144., 325.], [147., 420.]]#, [447.,0.]]
     set_speed(100)
     for i in xrange(len(path)-1):
         print 'path[i]',path[i]
