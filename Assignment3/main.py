@@ -19,6 +19,7 @@ def grown_obstacle(object):
     l = len(object)
     grown_obstacle = np.zeros((4*l,2))
     for i in xrange(l):
+        #Grown up by right and up
         grown_obstacle[0*l+i][0] = object[i][0]
         grown_obstacle[0*l+i][1] = object[i][1]
         grown_obstacle[1*l+i][0] = object[i][0]+23
@@ -27,6 +28,15 @@ def grown_obstacle(object):
         grown_obstacle[2*l+i][1] = object[i][1]
         grown_obstacle[3*l+i][0] = object[i][0]
         grown_obstacle[3*l+i][1] = object[i][1]+23
+        #Grown up by left and 
+        # grown_obstacle[0*l+i][0] = object[i][0]
+        # grown_obstacle[0*l+i][1] = object[i][1]
+        # grown_obstacle[1*l+i][0] = object[i][0]-23
+        # grown_obstacle[1*l+i][1] = object[i][1]+23
+        # grown_obstacle[2*l+i][0] = object[i][0]-23
+        # grown_obstacle[2*l+i][1] = object[i][1]
+        # grown_obstacle[3*l+i][0] = object[i][0]
+        # grown_obstacle[3*l+i][1] = object[i][1]+23
         #plt.plot(grown_obstacle[:,0],grown_obstacle[:,1],'ko')
     return grown_obstacle
 
