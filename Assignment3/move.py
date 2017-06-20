@@ -42,7 +42,9 @@ def left_deg(deg=None):
     This function sets the encoder to the correct number
      of pulses and then invokes left().
     '''
-    set_speed(100)
+    set_speed(150)
+    if deg <50:
+        set_speed(150)
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(0,1,pulse)
@@ -56,7 +58,9 @@ def right_deg(deg=None):
     This function sets the encoder to the correct number
      of pulses and then invokes right().
     '''
-    set_speed(100)
+    set_speed(150)
+    if deg <50:
+        set_speed(150)
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(1,0,pulse)
@@ -165,17 +169,32 @@ def move_to_next(position1, position2):
             angle_goal = 270
 
     angle_diff = angle_goal - theta
-    if angle_diff>360:
+    if angle_diff>=360:
         angle_diff = angle_diff - 360
-        
-    if angle_diff>0:
+    if angle_diff<0:
+        angle_diff = angle_diff + 360
+
+    if angle_diff>180:
+        right_deg(360 - angle_diff*scale)
+        update_pos(-(360 - angle_diff*scale),0,0)
+    elif angle_diff>0.1:
         left_deg(angle_diff*scale)
         update_pos(angle_diff,0,0)
-    elif angle_diff<0:
-        right_deg(-angle_diff*scale)
-        update_pos(angle_diff,0,0)
+    #if angle_diff>0:
+        #left_deg(angle_diff*scale)
+        #update_pos(angle_diff,0,0)
+    #elif angle_diff<0:
+        #right_deg(-angle_diff*scale)
+        #update_pos(angle_diff,0,0)
+    #if angle_diff < 0:
+    #    
+    #if angle_diff>180:
+    #    right_deg(360 - angle_diff*scale)
+    #elif angle_diff<=180:
+    #    left_deg(angle_diff*scale)
     time.sleep(abs(angle_diff)/30.)
-    fwd_cm(move_dis)
+    fwd_cm(move_dis*0.9)
+    print "move_dis\n\n\n",move_dis
     update_pos(0,move_dis,0)
     time.sleep(move_dis/10.)
 
@@ -187,7 +206,7 @@ def move_to_next(position1, position2):
     
 
 if __name__ == '__main__':
-    path = [[0.,0.], [100.,50.],[200.,-50.], [300., 0.], [400., 50.], [447.,0.]]
+    path = [[0.,0.], [100.,-100.],[200.,0.], [300., 0.], [400., 0.]]#, [447.,0.]]
     set_speed(100)
     for i in xrange(len(path)-1):
         print 'path[i]',path[i]
