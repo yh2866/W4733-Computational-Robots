@@ -215,7 +215,7 @@ def check_intersect(segment1, segment2):
 
     if X1 == X2 or X3 == X4:
         # print "x1 == x2 or x3 == x4"
-        if X1 == X2 == X3 == X4:
+        if X1 == X2 and X3 == X4:
             return True
         elif X1 == X2:
             # print "x1 == x2"
