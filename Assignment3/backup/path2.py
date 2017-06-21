@@ -1,7 +1,7 @@
 from gopigo import *
 import time
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import sys
 
 en_debug = 1
@@ -34,6 +34,7 @@ HIT_MLINE_Y_LIST = []
 LEAVE_MLINE_X_LIST = []
 LEAVE_MLINE_Y_LIST = []
 SECONDVISITMLINE = -1
+TIMES = 0
 
 def left_deg(deg=None):
     '''
@@ -42,14 +43,29 @@ def left_deg(deg=None):
     This function sets the encoder to the correct number
      of pulses and then invokes left().
     '''
-    set_speed(150)
-    if deg <50:
-        set_speed(150)
+    global TIMES
+    if TIMES == 0:
+        deg = deg * 1.30
+        TIMES = TIMES + 1
+    elif TIMES == 1:
+        deg = deg *1.30 + 5
+        TIMES = TIMES + 1
+    elif TIMES == 3:
+        deg = deg * 1.1
+        TIMES = TIMES + 1
+##    else:
+##        deg = deg * 1.1
+
+    #deg = deg * 1.3
+##    set_speed(150)
+##    if deg <50:
+##        set_speed(135)
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(0,1,pulse)
     left()
-
+    
+   
 
 def right_deg(deg=None):
     '''
@@ -58,32 +74,19 @@ def right_deg(deg=None):
     This function sets the encoder to the correct number
      of pulses and then invokes right().
     '''
-    set_speed(150)
-    if deg <50:
-        set_speed(150)
+    global TIMES
+    if TIMES == 2:
+        deg = deg * 1.6 + 5
+        TIMES = TIMES + 1
+    #deg = deg * 1.5
+##    set_speed(150)
+##    if deg <50:
+##        set_speed(135)
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(1,0,pulse)
     right()
-
-
-def detect(d1, d2):
-    SAMPLE = 5
-    REQUIRED = 2
-
-    sampling = []
-    for j in range(SAMPLE):
-        time.sleep(0.07)
-
-        d = us_dist(15)
-        # print(d)
-        if d <= d1 and d > d2:
-            sampling.append(d)
-
-    if len(sampling) >= REQUIRED:
-        return True
-    else:
-        return False
+    
 
 def cm2pulse(dist):
     '''
@@ -94,10 +97,6 @@ def cm2pulse(dist):
     revs = dist/wheel_circ
     PPR = 18 # [p/rev] encoder Pulses Per wheel Revolution
     pulses = PPR*revs # [p] encoder pulses required to move dist cm.
-    if en_debug:
-        print 'WHEEL_RAD',WHEEL_RAD
-        print 'revs',revs
-        print 'pulses',pulses
     return pulses
 
 
@@ -121,8 +120,6 @@ def update_pos(theta_change, X_change, Y_change):
     global Y
     global theta
     global Previous_Matrix
-    global OBSTACLE_X
-    global OBSTACLE_Y
 
     Currrent_Pos_Temp = np.dot(Previous_Matrix, transform_matrix(-90,0,0))
     Currrent_Pos_Temp = np.dot(Currrent_Pos_Temp, transform_matrix( 0 ,10,0))
@@ -176,37 +173,27 @@ def move_to_next(position1, position2):
 
     if angle_diff>180:
         right_deg(360 - angle_diff*scale)
+        print "Turh right:", 360 - angle_diff*scale
         update_pos(-(360 - angle_diff*scale),0,0)
+        time.sleep(abs(360 - angle_diff*scale)/20.)
     elif angle_diff>0.1:
         left_deg(angle_diff*scale)
+        print "Turn left:", angle_diff*scale
         update_pos(angle_diff,0,0)
-    #if angle_diff>0:
-        #left_deg(angle_diff*scale)
-        #update_pos(angle_diff,0,0)
-    #elif angle_diff<0:
-        #right_deg(-angle_diff*scale)
-        #update_pos(angle_diff,0,0)
-    #if angle_diff < 0:
-    #    
-    #if angle_diff>180:
-    #    right_deg(360 - angle_diff*scale)
-    #elif angle_diff<=180:
-    #    left_deg(angle_diff*scale)
-    time.sleep(abs(angle_diff)/30.)
-    fwd_cm(move_dis*0.9)
-    print "move_dis\n\n\n",move_dis
+        time.sleep(abs(angle_diff*scale)/30.)
+    fwd_cm(move_dis)
+    print "move_dis:",move_dis
     update_pos(0,move_dis,0)
-    time.sleep(move_dis/10.)
-
-
-
-
+    time.sleep(move_dis/30.)
 
 
     
 
 if __name__ == '__main__':
-    path = [[0.,0.], [60.,20.],[88.,150.], [102., 289.], [144., 325.], [147., 420.]]#, [447.,0.]]
+    #Grow up right & up
+    #path = [[60.,20.],[88.,150.], [102., 289.], [144., 325.], [147., 420.]]
+    #Grow up left & up
+    path = [[60.0, 20.0], [97.0, 145.0], [147.0, 221.0], [151.0, 325.0], [147.0, 420.0]]
     set_speed(100)
     for i in xrange(len(path)-1):
         print 'path[i]',path[i]
