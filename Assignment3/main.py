@@ -198,6 +198,7 @@ class Graph:
 
         return result
 
+# checks if two line segments intersect
 def check_intersect(segment1, segment2):
     X1 = segment1[0][0]
     X2 = segment1[1][0]
@@ -213,6 +214,7 @@ def check_intersect(segment1, segment2):
         # print "False -1"
         return False
 
+    # edge case dealing. Having the same x coordinates causses division by zero error.
     if X1 == X2 or X3 == X4:
         # print "x1 == x2 or x3 == x4"
         if X1 == X2 and X3 == X4:
@@ -270,11 +272,14 @@ def check_intersect(segment1, segment2):
         return True
 
 
+# after we transform each object / obstacle to a grown obstacle, we need to connect all
+# the vertices to create edges
 def createEachGrownObjectEdgesList(graph, graham_scan_result_pts_grouped_by_object_list):
     ObjectsEdges = []
 
     count = 0
 
+    # connect all the vertices of each grown object vertices
     for r in graham_scan_result_pts_grouped_by_object_list:
         for i in range(1, len(r)):
             ObjectsEdges.append([r[i], r[i - 1]])
@@ -291,6 +296,8 @@ def createEachGrownObjectEdgesList(graph, graham_scan_result_pts_grouped_by_obje
 
 def connectDiffObjectsWithEdges(graph, graham_scan_result_pts_grouped_by_object_list, ObjectsEdges):
 
+    # picking two points that belong in two different obstacles (otherwise, we could end up connecting
+    # two points that belong to the same obstacle)
     for i in range(len(graham_scan_result_pts_grouped_by_object_list)):
         for j in range(i + 1, len(graham_scan_result_pts_grouped_by_object_list)):
 
@@ -300,11 +307,16 @@ def connectDiffObjectsWithEdges(graph, graham_scan_result_pts_grouped_by_object_
             for k in range(len(r1)):
                 for l in range(len(r2)):
 
+                    # start point is a point in one obstacle
                     startPt = r1[k]
+
+                    # end point is another point in a different obstacle
                     endPt = r2[l]
 
                     testEdges = []
 
+                    # remove the edges that contain either start point or end point from the edges
+                    # that we will use to check line intersection.
                     for e in ObjectsEdges:
                         if e[0] != startPt and e[1] != startPt and e[0] != endPt and e[1] != endPt:
                             testEdges.append(e)
@@ -320,18 +332,16 @@ def connectDiffObjectsWithEdges(graph, graham_scan_result_pts_grouped_by_object_
                     gIdx = 0
 
                     if testPass:
+                        # calculating the index for the start test point
                         for idx in range(0, i):
                             sIdx += len(graham_scan_result_pts_grouped_by_object_list[idx])
                         sIdx += k
 
+                        # calculating the index for the end test point
                         for idx in range(0, j):
                             gIdx += len(graham_scan_result_pts_grouped_by_object_list[idx])
                         gIdx += l
 
-                        # print " startPt ", startPt, " idx ", sIdx
-                        # print " endPt ", endPt, " idx ", gIdx
-                        # print "testPass ", testPass
-                        # print "i ", i, " j ", j
 
                         graph.addUndirectedEdge(sIdx, gIdx)
                         plt.plot([graph.vertices[sIdx].x, graph.vertices[gIdx].x], [graph.vertices[sIdx].y, graph.vertices[gIdx].y], 'y-')
@@ -342,6 +352,7 @@ def connectDiffObjectsWithEdges(graph, graham_scan_result_pts_grouped_by_object_
 def generateGraphPts(graham_scan_result_pts_grouped_by_object_list):
     pts = []
 
+    # save all the necessary points resulted from
     for r in graham_scan_result_pts_grouped_by_object_list:
         pts += r
 
@@ -349,25 +360,32 @@ def generateGraphPts(graham_scan_result_pts_grouped_by_object_list):
 
 
 def parseData(filename):
+    # open up the file
     with open(filename) as f:
         content = f.readlines()
 
+    # parse each line
     content = [x.strip() for x in content]
     print(content)
 
+    # save the start point
     startx, starty = map(float, content[0].split())
     start_point = [startx, starty]
 
+    # save the goal point
     goalx, goaly = map(float, content[1].split())
     goal_point = [goalx, goaly]
 
+    # save the dimension
     dimensions_x, dimensions_y = map(float, content[2].split())
 
+    # get the number of obstacles /objects
     numObj = int(content[3])
 
     contentIdx = 4
     objects = []
 
+    # for each object store the vertices
     for i in range(numObj):
         object = []
 
@@ -387,6 +405,7 @@ def parseData(filename):
     return start_point, goal_point, objects, dimensions_x, dimensions_y
 
 
+# plot the start point, goal point and the obstacles
 def graphData(start_point, goal_point, objects):
     plt.plot(start_point[0],start_point[1],'go',ms=10)
     plt.plot(goal_point[0],goal_point[1],'go',ms=10)
@@ -395,14 +414,18 @@ def graphData(start_point, goal_point, objects):
         plot_environment(np.array(object))
 
 
+# gorw obstacle and perform graham scan
 def growAndGrahamScanObjects(objects, start_point, goal_point):
     grown_object_pts_list = []
 
+    # for each object / obstacle, grow the obstacle.
     for object in objects:
         grown_object_pts_list.append([list(x) for x in grown_obstacle(object)])
 
     graham_scan_result_pts_grouped_by_object_list = []
 
+
+    # for each grown object / objstacle, perform graham scan
     for pts in grown_object_pts_list:
         r = graham_scan(pts)
         plot_grown_obstacle(np.array(r))
@@ -415,11 +438,16 @@ def growAndGrahamScanObjects(objects, start_point, goal_point):
 
 
 def getOptimalPathPts(graph):
+
+    # perform dijkstrao on the start point (which has len(vertices) - 2 as its index)
     graph.dijkstra(len(graph.vertices) - 2)
+
+    # get the shortest path vertices to the goal point which has the last index
     result_vertex_indices = graph.shortestPath(len(graph.vertices) - 2, len(graph.vertices) - 1)
 
     result = []
 
+    # save the result
     for i in result_vertex_indices:
         result.append([graph.vertices[i].x, graph.vertices[i].y])
 
@@ -427,7 +455,7 @@ def getOptimalPathPts(graph):
 
     return result
 
-
+# plot the optimal path
 def plotOptimalPath(result):
     # plot shortest path
     for i in range(1, len(result)):
