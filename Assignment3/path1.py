@@ -45,16 +45,15 @@ def left_deg(deg=None):
     '''
     global TIMES
     if TIMES == 0:
-        deg = deg * 1.30
+        deg = deg * 1.15
+        #deg = deg * 1.18
         TIMES = TIMES + 1
     elif TIMES == 1:
-        deg = deg *1.30 + 5
+        deg = deg * 1.20 + 4
         TIMES = TIMES + 1
     elif TIMES == 3:
-        deg = deg * 1.1
+        deg = deg * 1.20 + 10
         TIMES = TIMES + 1
-##    else:
-##        deg = deg * 1.1
 
     #deg = deg * 1.3
 ##    set_speed(150)
@@ -101,7 +100,7 @@ def cm2pulse(dist):
 
 
 def fwd_cm(dist=None):
-    set_speed(200)
+    set_speed(250)
     if dist is not None:
         pulse = int(cm2pulse(dist))
         enc_tgt(1,1,pulse)
@@ -145,6 +144,7 @@ def update_pos(theta_change, X_change, Y_change):
 
 def move_to_next(position1, position2):
     global theta
+    global TIMES
     scale = 1.0
     x_diff = position2[0] - position1[0]
     y_diff = position2[1] - position1[1]
@@ -175,16 +175,24 @@ def move_to_next(position1, position2):
         right_deg(360 - angle_diff*scale)
         print "Turh right:", 360 - angle_diff*scale
         update_pos(-(360 - angle_diff*scale),0,0)
-        time.sleep(abs(360 - angle_diff*scale)/20.)
+        time.sleep(abs(360 - angle_diff*scale)/50.)
     elif angle_diff>0.1:
         left_deg(angle_diff*scale)
         print "Turn left:", angle_diff*scale
         update_pos(angle_diff,0,0)
-        time.sleep(abs(angle_diff*scale)/30.)
+        if TIMES != 4:
+            time.sleep(abs(angle_diff*scale)/50.)
+        else:
+            time.sleep(abs(angle_diff*scale)/40.)
+        #else:
+        #    time.sleep(abs(angle_diff*scale)/40.)
     fwd_cm(move_dis)
     print "move_dis:",move_dis
     update_pos(0,move_dis,0)
-    time.sleep(move_dis/30.)
+    if TIMES != 3:
+        time.sleep(move_dis/55.)
+    else:
+        time.sleep(move_dis/40.)
 
 
     
