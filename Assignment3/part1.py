@@ -36,6 +36,8 @@ LEAVE_MLINE_Y_LIST = []
 SECONDVISITMLINE = -1
 TIMES = 0
 
+
+###############Turn Left##############
 def left_deg(deg=None):
     '''
     Turn chassis left by a specified number of degrees.
@@ -55,17 +57,13 @@ def left_deg(deg=None):
         deg = deg * 1.20 + 10
         TIMES = TIMES + 1
 
-    #deg = deg * 1.3
-##    set_speed(150)
-##    if deg <50:
-##        set_speed(135)
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(0,1,pulse)
     left()
     
    
-
+#############Turn Right#############
 def right_deg(deg=None):
     '''
     Turn chassis right by a specified number of degrees.
@@ -77,16 +75,14 @@ def right_deg(deg=None):
     if TIMES == 2:
         deg = deg * 1.6 + 5
         TIMES = TIMES + 1
-    #deg = deg * 1.5
-##    set_speed(150)
-##    if deg <50:
-##        set_speed(135)
+
     if deg is not None:
         pulse= int(deg/DPR)
         enc_tgt(1,0,pulse)
     right()
     
 
+#######Impulse#######
 def cm2pulse(dist):
     '''
     Calculate the number of pulses to move the chassis dist cm.
@@ -99,6 +95,7 @@ def cm2pulse(dist):
     return pulses
 
 
+#############Move forward##############
 def fwd_cm(dist=None):
     set_speed(250)
     if dist is not None:
@@ -107,6 +104,7 @@ def fwd_cm(dist=None):
     fwd()
 
 
+#############Transform Matrix##########
 def transform_matrix(rotate_angle, x_move, y_move):
     T = [[np.cos(rotate_angle/180.*3.14), -np.sin(rotate_angle/180.*3.14), x_move],
          [np.sin(rotate_angle/180.*3.14),  np.cos(rotate_angle/180.*3.14), y_move],
@@ -114,6 +112,7 @@ def transform_matrix(rotate_angle, x_move, y_move):
     return T
 
 
+#############Update Positions################
 def update_pos(theta_change, X_change, Y_change):
     global X
     global Y
@@ -122,7 +121,6 @@ def update_pos(theta_change, X_change, Y_change):
 
     Currrent_Pos_Temp = np.dot(Previous_Matrix, transform_matrix(-90,0,0))
     Currrent_Pos_Temp = np.dot(Currrent_Pos_Temp, transform_matrix( 0 ,10,0))
-    Currrent_Pos_Obstacle = np.dot(Currrent_Pos_Temp, Original_Pos)
 
     Previous_Matrix = np.dot(Previous_Matrix,transform_matrix(theta_change,X_change,Y_change))
     Current_Pos = np.dot(Previous_Matrix,Original_Pos)
@@ -142,6 +140,8 @@ def update_pos(theta_change, X_change, Y_change):
         print "X", X
         print "Y", Y
 
+
+###########Move from point to point###########
 def move_to_next(position1, position2):
     global theta
     global TIMES
@@ -149,7 +149,7 @@ def move_to_next(position1, position2):
     x_diff = position2[0] - position1[0]
     y_diff = position2[1] - position1[1]
     move_dis = np.sqrt(x_diff**2 + y_diff**2)
- 
+    #Calculate goal angles
     if x_diff != 0:
         if x_diff > 0 and y_diff >=0: #Phase 1
             angle_goal = np.arctan((y_diff/ x_diff)) / 3.14 * 180
@@ -164,7 +164,7 @@ def move_to_next(position1, position2):
             angle_goal = 90
         elif y_diff < 0:
             angle_goal = 270
-
+    #Calculate the turning angles
     angle_diff = angle_goal - theta
     if angle_diff>=360:
         angle_diff = angle_diff - 360
@@ -184,8 +184,6 @@ def move_to_next(position1, position2):
             time.sleep(abs(angle_diff*scale)/50.)
         else:
             time.sleep(abs(angle_diff*scale)/40.)
-        #else:
-        #    time.sleep(abs(angle_diff*scale)/40.)
     fwd_cm(move_dis)
     print "move_dis:",move_dis
     update_pos(0,move_dis,0)
