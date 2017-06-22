@@ -54,7 +54,8 @@ def left_deg(deg=None):
         deg = deg * 1.20 + 4
         TIMES = TIMES + 1
     elif TIMES == 3:
-        deg = deg * 1.20 + 10
+        #deg = deg * 1.20 + 10
+        deg = deg * 1.20 + 5
         TIMES = TIMES + 1
 
     if deg is not None:
@@ -97,7 +98,10 @@ def cm2pulse(dist):
 
 #############Move forward##############
 def fwd_cm(dist=None):
+    global TIMES
     set_speed(250)
+    if TIMES == 4:
+        dist = dist + 10
     if dist is not None:
         pulse = int(cm2pulse(dist))
         enc_tgt(1,1,pulse)
