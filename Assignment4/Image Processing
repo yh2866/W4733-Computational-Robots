@@ -1,0 +1,48 @@
+import numpy as np
+import cv2
+
+img = cv2.imread('123.jpg')
+#im_gray = cv2.imread('hockney.png', cv2.IMREAD_GRAYSCALE)
+#img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+lower_blue = np.array([0,50,50])
+upper_blue = np.array([2000,255,255])
+
+# Threshold the HSV image to get only blue colors
+mask = cv2.inRange(img, lower_blue, upper_blue)
+
+cv2.imshow('Erosion', mask)
+cv2.waitKey(0)
+
+#ret, im_bw = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+th3 = cv2.adaptiveThreshold(mask,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            cv2.THRESH_BINARY,11,2)
+
+# Set up the SimpleBlobdetector with default parameters.
+params = cv2.SimpleBlobDetector_Params()
+# Filter by Area.
+params.filterByArea = True
+params.minArea = 10
+#detect points
+detector = cv2.SimpleBlobDetector_create(params)
+
+reversemask=255-th3
+keypoints = detector.detect(reversemask)
+
+for keyPoint in keypoints:
+    x = keyPoint.pt[0]
+    y = keyPoint.pt[1]
+    s = keyPoint.size
+    print "x=",x
+    print "y=",y
+    print "size=",s
+    print "#################"
+
+img = cv2.drawKeypoints(img, keypoints, None, color=(0,255,0), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+cv2.imshow('Erosion', img)
+cv2.waitKey(0)
+
+cv2.imshow('Erosion', th3)
+cv2.waitKey(0)
+
+cv2.imwrite('bw_image.png', mask)
