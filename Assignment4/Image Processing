@@ -14,6 +14,12 @@ mask = cv2.inRange(img, lower_blue, upper_blue)
 cv2.imshow('Erosion', mask)
 cv2.waitKey(0)
 
+#######blur erosion dialation
+#blur = cv2.GaussianBlur(im_bw,(5,5),0)
+#kernel = np.ones((5,5), np.uint8)
+#img_erosion = cv2.erode(blur, kernel, iterations=1)
+#img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
+
 #ret, im_bw = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
 th3 = cv2.adaptiveThreshold(mask,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
             cv2.THRESH_BINARY,11,2)
