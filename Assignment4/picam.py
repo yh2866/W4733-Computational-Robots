@@ -10,9 +10,9 @@ camera = picamera.PiCamera()
 k = 0 
 while(True & k < 10):
 
-	#saves what the robot currently sees 
-	camera.capture('img.jpg')
-	img = cv2.imread('img.jpg')
+    #saves what the robot currently sees 
+    camera.capture('img.jpg')
+    img = cv2.imread('img.jpg')
 
 	#apply mask with lower and upper blue H values
     lower_blue = np.array([60,50,50])
@@ -24,6 +24,6 @@ while(True & k < 10):
     #save image with number
     cv2.imwrite('img'+str(k)+'.jpg',mask)
     
-	k = k + 1
-	time.sleep(10)
+    k = k + 1
+    time.sleep(10)
 
