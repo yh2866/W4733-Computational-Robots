@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 np.set_printoptions(suppress=True)
 
-frame = cv2.imread('img.jpg')
+frame = cv2.imread('orange.jpg')
 
 hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 hsv = cv2.GaussianBlur(hsv,(5,5),0)
@@ -13,11 +13,11 @@ h = cv2.calcHist([hsv],[0],None,[180],[0,180])
 h.astype(np.uint8)
 
 
-s = cv2.calcHist([hsv],[1],None,[255],[0,255])
+s = cv2.calcHist([hsv],[1],None,[256],[0,256])
 s.astype(np.uint8)
 
 
-v = cv2.calcHist([hsv],[2],None,[255],[0,255])
+v = cv2.calcHist([hsv],[2],None,[256],[0,256])
 v.astype(np.uint8)
 
 
@@ -57,11 +57,22 @@ im_gray = cv2.GaussianBlur(im_gray, (5, 5), 0)
 im_gray2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 im_gray2 = cv2.GaussianBlur(im_gray2, (5, 5), 0)
 (thresh, im_bw2) = cv2.threshold(im_gray2, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+kernel = np.ones((3,3), np.uint8)
+img_erosion = cv2.erode(im_bw2, kernel, iterations=1)
+img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
 
+params = cv2.SimpleBlobDetector_Params()
+
+params.filterByArea = True
+params.minArea = 10
+
+detector = cv2.SimpleBlobDetector_create(params)
+
+print "detect ", detector
 
 cv2.imshow("original ", frame)
 cv2.imshow("hsv_binary", im_bw)
-cv2.imshow("otsu+binary", im_bw2)
+cv2.imshow("otsu+binary", img_dilation)
 
 cv2.waitKey()
 
