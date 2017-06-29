@@ -4,142 +4,148 @@ from matplotlib import pyplot as plt
 
 np.set_printoptions(suppress=True)
 
-frame = cv2.imread('orange.jpg')
 
-hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-hsv = cv2.GaussianBlur(hsv,(5,5),0)
+list_of_clicks = []
 
-h = cv2.calcHist([hsv],[0],None,[180],[0,180])
-h.astype(np.uint8)
+def getXY(img):
+    #define the event
+    def getxy_callback(event, x, y, flags, param):
+        global list_of_clicks
 
+        if event == cv2.EVENT_LBUTTONDOWN :
+            list_of_clicks.append([x,y])
+            print "click point is...", (x,y)
 
-s = cv2.calcHist([hsv],[1],None,[256],[0,256])
-s.astype(np.uint8)
+    #Read the image
+    print "Reading the image..."
 
+    #Set mouse CallBack event
+    cv2.namedWindow('image')
+    cv2.setMouseCallback('image', getxy_callback)
 
-v = cv2.calcHist([hsv],[2],None,[256],[0,256])
-v.astype(np.uint8)
-
-
-
-print "h ", np.argmax(h)
-print "s ", np.argmax(s)
-print "v ", np.argmax(v)
-
-plt.plot(h.flatten(), 'r')
-plt.plot(s.flatten(), 'b')
-plt.plot(v.flatten(), 'g')
-plt.show()
-
-# print "h ", h
-# print "s ", s
-# print "v ", v
-
-h_min = max(0, np.argmax(h) - 10)
-h_max = min(179, np.argmax(h) + 10)
-
-s_min = max(0, np.argmax(s) - 10)
-s_max = min(255, np.argmax(s) + 10)
-
-v_min = max(0, np.argmax(v) - 10)
-v_max = min(255, np.argmax(v) + 10)
-
-mask = cv2.inRange(hsv, np.array([h_min, 50, 50]), np.array([h_max, 255, 255]))
-output = cv2.bitwise_and(hsv, hsv, mask = mask)
-
-im_hsv = cv2.cvtColor(output, cv2.COLOR_HSV2BGR)
-im_gray = cv2.cvtColor(im_hsv, cv2.COLOR_BGR2GRAY)
-im_gray = cv2.GaussianBlur(im_gray, (5, 5), 0)
-(thresh, im_bw) = cv2.threshold(im_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    print "Please select the color by clicking on the screen..."
+    cvimage = cv2.imread(img)
+    cv2.imshow('image', cvimage)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    #obtain the matrix of the selected points
+    print "The clicked points..."
+    print list_of_clicks
+    return list_of_clicks
 
 
+def get_threshold(hsv):
 
-im_gray2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-im_gray2 = cv2.GaussianBlur(im_gray2, (5, 5), 0)
-(thresh, im_bw2) = cv2.threshold(im_gray2, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
-kernel = np.ones((3,3), np.uint8)
-img_erosion = cv2.erode(im_bw2, kernel, iterations=1)
-img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
+    h = cv2.calcHist([hsv],[0],None,[180],[0,180])
+    h.astype(np.uint8)
 
-params = cv2.SimpleBlobDetector_Params()
+    s = cv2.calcHist([hsv],[1],None,[256],[0,256])
+    s.astype(np.uint8)
 
-params.filterByArea = True
-params.minArea = 10
+    v = cv2.calcHist([hsv],[2],None,[256],[0,256])
+    v.astype(np.uint8)
 
-detector = cv2.SimpleBlobDetector_create(params)
+    # print "h ", np.argmax(h)
+    # print "s ", np.argmax(s)
+    # print "v ", np.argmax(v)
 
-print "detect ", detector
+    plt.plot(h.flatten(), 'r')
+    plt.plot(s.flatten(), 'b')
+    plt.plot(v.flatten(), 'g')
+    plt.show()
 
-cv2.imshow("original ", frame)
-cv2.imshow("hsv_binary", im_bw)
-cv2.imshow("otsu+binary", img_dilation)
+    # print "h ", h
+    # print "s ", s
+    # print "v ", v
 
-cv2.waitKey()
+    h_min = max(0, np.argmax(h) - 35)
+    h_max = min(179, np.argmax(h) + 35)
 
+    s_min = max(0, np.argmax(s) - 35)
+    s_max = min(255, np.argmax(s) + 35)
 
-# print "x ", x, " y", y, " z", z
+    v_min = max(0, np.argmax(v) - 35)
+    v_max = min(255, np.argmax(v) + 35)
 
-
-# thresh = np.mean(a, axis = 0)
-
-# print "thresh ", thresh
-# result = []
-
-# print "size ", np.size(a)
+    return h_min, h_max, s_min, s_max, v_min, v_max
 
 
 
-# for t in a:
-#     # print "t ", t
-#     if t[0] > thresh[0] and t[1] < thresh[1] and t[2] < thresh[2]:
-#         # print "yes"
-#         result.append(np.array([255, 255, 255], dtype=np.uint8))
-#     else:
-#         # print "no"
-#         result.append(np.array([0, 0, 0], dtype=np.uint8))
+def mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max):
+    mask = cv2.inRange(hsv, np.array([h_min, s_min, v_min]), np.array([h_max, s_max, v_max]))
+    output = cv2.bitwise_and(hsv, hsv, mask = mask)
 
-# # result = np.reshape(np.array(result), (x, y, z))
-# # a, b, c = result.shape
+    im_hsv = cv2.cvtColor(output, cv2.COLOR_HSV2BGR)
+    im_gray = cv2.cvtColor(im_hsv, cv2.COLOR_BGR2GRAY)
+    (thresh, im_bw) = cv2.threshold(im_gray, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+    kernel = np.ones((3,3), np.uint8)
+    img_erosion = cv2.erode(im_bw, kernel, iterations=1)
+    img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
 
-# # print "a ", a, " b", b, " c", c
-# # for t in result:
-# #     print "t ", t
+    return img_dilation
 
 
+def get_centroid_area(img):
+    img_cpy = np.copy(img)
 
-# np.savetxt("file.txt", np.array(result), fmt = '%i')
-# result = np.reshape(np.array(result), (x, y, z))
+    contours, hierarchy = cv2.findContours(img_cpy, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-# blur = cv2.GaussianBlur(result,(5,5),0)
-# kernel = np.ones((5,5), np.uint8)
-# img_erosion = cv2.erode(blur, kernel, iterations=20)
-# img_dilation = cv2.dilate(img_erosion, kernel, iterations=20)
+    # maxContourData = 0
+    maxArea = 0
+    M = 0
 
-# cv2.imshow("image", result)
-# cv2.waitKey()
+    print "contours ", len(contours)
 
-# img = cv2.imread('image.jpg',0)
+    for contour in contours:
+        area = cv2.contourArea(contour)
+        if area > maxArea:
+            maxArea = area
+            # maxContourData = contour
+            M = cv2.moments(contour)
 
-# # Find the largest contour and extract it
-# ret, Ithres = cv2.threshold(Rfilter,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    cx = M['m10'] / M['m00']
+    cy = M['m01'] / M['m00']
 
-# im, contours, hierarchy = cv2.findContours(Ithres,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE )
+    print "cx ", cx, " cy ", cy
+    print "area ", maxArea
 
-# maxContour = 0
-# for contour in contours:
-#     contourSize = cv2.contourArea(contour)
-#     if contourSize > maxContour:
-#         maxContour = contourSize
-#         maxContourData = contour
+    return cx, cy, maxArea
 
-# # Create a mask from the largest contour
-# mask = np.zeros_like(Ithres)
-# cv2.fillPoly(mask,[maxContourData],1)
 
-# # Use mask to crop data from original image
-# finalImage = np.zeros_like(Irgb)
-# finalImage[:,:,0] = np.multiply(R,mask)
-# finalImage[:,:,1] = np.multiply(G,mask)
-# finalImage[:,:,2] = np.multiply(B,mask)
-# cv2.imshow('final',finalImage)
-# cv2.waitKey()
+if __name__ == "__main__":
+    img_str = "img6.jpg"
+
+    getXY(img_str)
+    frame = cv2.imread(img_str)
+    # print "frame ", frame.shape
+
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    hsv = cv2.GaussianBlur(hsv,(5,5),0)
+
+    h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(hsv)
+
+    binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
+    cx, cy, area = get_centroid_area(binary_img)
+
+
+    # im_gray2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # im_gray2 = cv2.GaussianBlur(im_gray2, (5, 5), 0)
+    # (thresh, im_bw2) = cv2.threshold(im_gray2, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+
+    # detector = cv2.SimpleBlobDetector()
+    # keypoints = detector.detect(img_dilation)
+
+    # im_with_keypoints = cv2.drawKeypoints(img_dilation, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+    # # Show keypoints
+    # cv2.imshow("Keypoints", im_with_keypoints)
+
+    # Find the largest contour and extract it
+
+    cv2.imshow("original ", frame)
+    cv2.imshow("hsv_binary", binary_img)
+
+
+    cv2.waitKey()
+
+
