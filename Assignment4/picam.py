@@ -8,11 +8,11 @@ camera = picamera.PiCamera()
 
 #iterates through the loop 10 times
 k = 0 
-while(True & k < 10):
+while(True and k < 2):
 
     #saves what the robot currently sees 
-    camera.capture('img.jpg')
-    img = cv2.imread('img.jpg')
+    camera.capture('img_org' + str(k) + '.jpg')
+    img = cv2.imread('img_org' + str(k) + '.jpg')
 
 	#apply mask with lower and upper blue H values
     lower_blue = np.array([60,50,50])
