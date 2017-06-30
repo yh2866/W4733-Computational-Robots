@@ -34,6 +34,23 @@ def getXY(img):
     return list_of_clicks
 
 
+def get_rectangle_hsv(frame, list_of_clicks):
+    rectangle = []
+
+    for i in range(list_of_clicks[0][0], list_of_clicks[1][0]):
+        row = []
+        for j in range(list_of_clicks[0][1], list_of_clicks[1][1]):
+            row.append(frame[j][i])
+
+        rectangle.append(np.array(row))
+
+    rectangle = np.array(rectangle, dtype = 'uint8')
+    rectangle_hsv = cv2.cvtColor(rectangle, cv2.COLOR_BGR2HSV)
+
+    return rectangle_hsv
+
+
+
 def get_threshold(hsv):
 
     h = cv2.calcHist([hsv],[0],None,[180],[0,180])
@@ -85,6 +102,7 @@ def mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max):
     im_hsv = cv2.cvtColor(output, cv2.COLOR_HSV2BGR)
     im_gray = cv2.cvtColor(im_hsv, cv2.COLOR_BGR2GRAY)
     (thresh, im_bw) = cv2.threshold(im_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+
     kernel = np.ones((3,3), np.uint8)
     img_erosion = cv2.erode(im_bw, kernel, iterations=1)
     img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
@@ -92,8 +110,8 @@ def mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max):
     return img_dilation
 
 
-def get_centroid_area(img):
-    img_cpy = np.copy(img)
+def get_centroid_area(binary_img):
+    img_cpy = np.copy(binary_img)
 
     contours, hierarchy = cv2.findContours(img_cpy, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -119,63 +137,27 @@ def get_centroid_area(img):
     return cx, cy, maxArea
 
 
+
 if __name__ == "__main__":
     img_str = "img6.jpg"
 
     list_of_clicks = getXY(img_str)
     frame = cv2.imread(img_str)
-    # print "frame ", frame.shape
-
-    print "list_of_clicks x ", list_of_clicks[0][0], " ", list_of_clicks[1][0]
-    print "list_of_clicks y ", list_of_clicks[0][1], " ", list_of_clicks[1][1]
-
-    rectangle = []
-
-    for i in range(list_of_clicks[0][0], list_of_clicks[1][0]):
-        row = []
-        for j in range(list_of_clicks[0][1], list_of_clicks[1][1]):
-            # print "frame i, j", i, " ", j
-            row.append(frame[j][i])
-        rectangle.append(np.array(row))
-
-    rectangle = np.array(rectangle, dtype = 'uint8')
-    rectangle_hsv = cv2.cvtColor(rectangle, cv2.COLOR_BGR2HSV)
-
-    print "rec ", rectangle_hsv
-
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv,(5,5),0)
 
+    rectangle_hsv = get_rectangle_hsv(frame, list_of_clicks)
     h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(rectangle_hsv)
-
-
-    cv2.imshow("hsv img", hsv)
 
     binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
     cx, cy, area = get_centroid_area(binary_img)
-
-
-    # im_gray2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # im_gray2 = cv2.GaussianBlur(im_gray2, (5, 5), 0)
-    # (thresh, im_bw2) = cv2.threshold(im_gray2, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
-
-    # detector = cv2.SimpleBlobDetector()
-    # keypoints = detector.detect(img_dilation)
-
-    # im_with_keypoints = cv2.drawKeypoints(img_dilation, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-    # # Show keypoints
-    # cv2.imshow("Keypoints", im_with_keypoints)
-
-    # Find the largest contour and extract it
 
     print "coords ", cx, " ", cy
     print "area ", area
 
     cv2.imshow("original ", frame)
-    cv2.imshow("hsv_binary", binary_img)
-
+    cv2.imshow("binary", binary_img)
 
     cv2.waitKey()
 
