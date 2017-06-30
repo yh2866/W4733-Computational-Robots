@@ -58,14 +58,14 @@ def get_threshold(hsv):
     # print "s ", s
     # print "v ", v
 
-    h_min = max(0, np.argmax(h) - 60)
-    h_max = min(179, np.argmax(h) + 60)
+    h_min = max(0, np.argmax(h) - 15)
+    h_max = min(179, np.argmax(h) + 15)
 
-    s_min = max(0, np.argmax(s) - 60)
-    s_max = min(255, np.argmax(s) + 60)
+    s_min = max(0, np.argmax(s) - 15)
+    s_max = min(255, np.argmax(s) + 15)
 
-    v_min = max(0, np.argmax(v) - 60)
-    v_max = min(255, np.argmax(v) + 60)
+    v_min = max(0, np.argmax(v) - 15)
+    v_max = min(255, np.argmax(v) + 15)
 
     print "h_min ", h_min
     print "h_max ", h_max
@@ -84,9 +84,9 @@ def mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max):
 
     im_hsv = cv2.cvtColor(output, cv2.COLOR_HSV2BGR)
     im_gray = cv2.cvtColor(im_hsv, cv2.COLOR_BGR2GRAY)
-    (thresh, im_bw) = cv2.threshold(im_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    (thresh, im_bw) = cv2.threshold(im_gray, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
     kernel = np.ones((3,3), np.uint8)
-    img_erosion = cv2.erode(im_bw, kernel, iterations=1)
+    img_erosion = cv2.erode(im_gray, kernel, iterations=1)
     img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
 
     return img_dilation
@@ -132,28 +132,27 @@ if __name__ == "__main__":
     rectangle = []
 
     for i in range(list_of_clicks[0][0], list_of_clicks[1][0]):
+        print "i ", i
         row = []
         for j in range(list_of_clicks[0][1], list_of_clicks[1][1]):
-            # print "frame i, j", i, " ", j
-            row.append(frame[j][i])
+            print "frame i, j", i, " ", j
+            row.append(frame[i][j])
         rectangle.append(np.array(row))
 
     rectangle = np.array(rectangle, dtype = 'uint8')
-    rectangle_hsv = cv2.cvtColor(rectangle, cv2.COLOR_BGR2HSV)
 
-    print "rec ", rectangle_hsv
+    print "rec ", rectangle
 
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv,(5,5),0)
 
-    h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(rectangle_hsv)
+    h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(hsv)
 
 
-    cv2.imshow("hsv img", hsv)
 
     binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
-    cx, cy, area = get_centroid_area(binary_img)
+    # cx, cy, area = get_centroid_area(binary_img)
 
 
     # im_gray2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -169,9 +168,6 @@ if __name__ == "__main__":
     # cv2.imshow("Keypoints", im_with_keypoints)
 
     # Find the largest contour and extract it
-
-    print "coords ", cx, " ", cy
-    print "area ", area
 
     cv2.imshow("original ", frame)
     cv2.imshow("hsv_binary", binary_img)
