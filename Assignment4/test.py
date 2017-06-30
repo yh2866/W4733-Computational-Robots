@@ -1,6 +1,8 @@
 import cv2
+import picamera
 import numpy as np
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
+from move import * 
 
 np.set_printoptions(suppress=True)
 
@@ -66,10 +68,10 @@ def get_threshold(hsv):
     # print "s ", np.argmax(s)
     # print "v ", np.argmax(v)
 
-    plt.plot(h.flatten(), 'r')
-    plt.plot(s.flatten(), 'b')
-    plt.plot(v.flatten(), 'g')
-    plt.show()
+##    plt.plot(h.flatten(), 'r')
+##    plt.plot(s.flatten(), 'b')
+##    plt.plot(v.flatten(), 'g')
+##    plt.show()
 
     # print "h ", h
     # print "s ", s
@@ -140,6 +142,12 @@ def get_centroid_area(binary_img):
 
 if __name__ == "__main__":
     img_str = "img6.jpg"
+    
+    camera = picamera.PiCamera()
+    camera.resolution = (320, 240)
+    camera.capture(img_str)
+    time.sleep(0.5)
+    
 
     list_of_clicks = getXY(img_str)
     frame = cv2.imread(img_str)
@@ -151,14 +159,37 @@ if __name__ == "__main__":
     h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(rectangle_hsv)
 
     binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
-    cx, cy, area = get_centroid_area(binary_img)
+    ini_cx, ini_cy, ini_area = get_centroid_area(binary_img)
 
-    print "coords ", cx, " ", cy
-    print "area ", area
+    
+
+    print "coords ", ini_cx, " ", ini_cy
+    print "area ", ini_area
 
     cv2.imshow("original ", frame)
     cv2.imshow("binary", binary_img)
 
     cv2.waitKey()
+
+    while True:
+        camera.capture(img_str)
+        time.sleep(0.5)
+
+        frame = cv2.imread(img_str)
+
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        hsv = cv2.GaussianBlur(hsv,(5,5),0)
+
+        binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
+        cx, cy, area = get_centroid_area(binary_img)
+
+        move(cx, area)
+
+
+
+
+
+
+    
 
 
