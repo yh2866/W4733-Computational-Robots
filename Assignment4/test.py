@@ -58,28 +58,35 @@ def get_threshold(hsv):
     # print "s ", s
     # print "v ", v
 
-    h_min = max(0, np.argmax(h) - 35)
-    h_max = min(179, np.argmax(h) + 35)
+    h_min = max(0, np.argmax(h) - 15)
+    h_max = min(179, np.argmax(h) + 15)
 
-    s_min = max(0, np.argmax(s) - 35)
-    s_max = min(255, np.argmax(s) + 35)
+    s_min = max(0, np.argmax(s) - 15)
+    s_max = min(255, np.argmax(s) + 15)
 
-    v_min = max(0, np.argmax(v) - 35)
-    v_max = min(255, np.argmax(v) + 35)
+    v_min = max(0, np.argmax(v) - 15)
+    v_max = min(255, np.argmax(v) + 15)
+
+    print "h_min ", h_min
+    print "h_max ", h_max
+    print "s_min ", s_min
+    print "s_max ", s_max
+    print "v_min ", v_min
+    print "v_max ", v_max
 
     return h_min, h_max, s_min, s_max, v_min, v_max
 
 
 
 def mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max):
-    mask = cv2.inRange(hsv, np.array([h_min, s_min, v_min]), np.array([h_max, s_max, v_max]))
+    mask = cv2.inRange(hsv, np.array([h_min, s_min, v_min], dtype = 'uint8'), np.array([h_max, s_max, v_max], dtype = 'uint8'))
     output = cv2.bitwise_and(hsv, hsv, mask = mask)
 
     im_hsv = cv2.cvtColor(output, cv2.COLOR_HSV2BGR)
     im_gray = cv2.cvtColor(im_hsv, cv2.COLOR_BGR2GRAY)
-    (thresh, im_bw) = cv2.threshold(im_gray, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+    # (thresh, im_bw) = cv2.threshold(im_gray, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
     kernel = np.ones((3,3), np.uint8)
-    img_erosion = cv2.erode(im_bw, kernel, iterations=1)
+    img_erosion = cv2.erode(im_gray, kernel, iterations=1)
     img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
 
     return img_dilation
@@ -115,17 +122,37 @@ def get_centroid_area(img):
 if __name__ == "__main__":
     img_str = "img6.jpg"
 
-    getXY(img_str)
+    list_of_clicks = getXY(img_str)
     frame = cv2.imread(img_str)
     # print "frame ", frame.shape
+
+    print "list_of_clicks x ", list_of_clicks[0][0], " ", list_of_clicks[1][0]
+    print "list_of_clicks y ", list_of_clicks[0][1], " ", list_of_clicks[1][1]
+
+    rectangle = []
+
+    for i in range(list_of_clicks[0][0], list_of_clicks[1][0]):
+        print "i ", i
+        row = []
+        for j in range(list_of_clicks[0][1], list_of_clicks[1][1]):
+            print "frame i, j", i, " ", j
+            row.append(frame[i][j])
+        rectangle.append(np.array(row))
+
+    rectangle = np.array(rectangle, dtype = 'uint8')
+
+    print "rec ", rectangle
+
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv,(5,5),0)
 
-    h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(hsv)
+    h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(rectangle)
+
+
 
     binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
-    cx, cy, area = get_centroid_area(binary_img)
+    # cx, cy, area = get_centroid_area(binary_img)
 
 
     # im_gray2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
