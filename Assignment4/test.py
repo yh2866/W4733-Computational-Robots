@@ -147,43 +147,48 @@ if __name__ == "__main__":
     camera.resolution = (320, 240)
     camera.capture(img_str)
     time.sleep(0.5)
+##    
+##
+##    list_of_clicks = getXY(img_str)
+##    frame = cv2.imread(img_str)
+##
+##    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+##    hsv = cv2.GaussianBlur(hsv,(5,5),0)
+
+##    rectangle_hsv = get_rectangle_hsv(frame, list_of_clicks)
+##    h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(rectangle_hsv)
+##
+##    binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
+##    ini_cx, ini_cy, ini_area = get_centroid_area(binary_img)
+
     
 
-    list_of_clicks = getXY(img_str)
-    frame = cv2.imread(img_str)
+    # print "coords ", ini_cx, " ", ini_cy
+    # print "area ", ini_area
 
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    hsv = cv2.GaussianBlur(hsv,(5,5),0)
+    # cv2.imshow("original ", frame)
+    # cv2.imshow("binary", binary_img)
 
-    rectangle_hsv = get_rectangle_hsv(frame, list_of_clicks)
-    h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(rectangle_hsv)
+    # cv2.waitKey()
 
-    binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
-    ini_cx, ini_cy, ini_area = get_centroid_area(binary_img)
-
-    
-
-    print "coords ", ini_cx, " ", ini_cy
-    print "area ", ini_area
-
-    cv2.imshow("original ", frame)
-    cv2.imshow("binary", binary_img)
-
-    cv2.waitKey()
-
-    while True:
-        camera.capture(img_str)
-        time.sleep(0.5)
-
-        frame = cv2.imread(img_str)
-
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        hsv = cv2.GaussianBlur(hsv,(5,5),0)
-
-        binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
-        cx, cy, area = get_centroid_area(binary_img)
-
-        move(cx, area)
+##    while True:
+##        camera.capture(img_str)
+##        time.sleep(2)
+##
+##        frame = cv2.imread(img_str)
+##
+##        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+##        hsv = cv2.GaussianBlur(hsv,(5,5),0)
+##
+##        binary_img = mask_hsv_img(hsv, 46, 106, 47, 107, 20, 80)
+##        print "before"
+##        cv2.imwrite("binary.jpg", binary_img)
+##        time.sleep(2)
+##        print "after"            
+##        
+##        cx, cy, area = get_centroid_area(binary_img)
+##
+##        move(cx, area)
 
 
 
