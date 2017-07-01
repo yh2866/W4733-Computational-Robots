@@ -69,15 +69,18 @@ def cm2pulse(dist):
     return pulses
 
 def move(cx, area_current):
+    set_speed(90)
     global area_original
     global original_flag
     resolution_middle = 160
     if cx < 160-10:
-        left_deg(10)
-        time.sleep(1)
+        left_deg((160-cx)/2.5)
+        print 'turn left', (160-cx)/2.5
+        time.sleep(0.2)
     elif cx > 160+10:
-        right_deg(10)
-        time.sleep(1)
+        right_deg((cx-160)/2.5)
+        print 'turn right', (cx-160)/2.5
+        time.sleep(0.2)
     #Set the orginal area
     if original_flag == 1:
         area_original = area_current
@@ -85,11 +88,11 @@ def move(cx, area_current):
     #Turn the flag to 0 when original is set
     if original_flag == 0:
         if area_current/area_original<0.9:
-            fwd_cm(5)
-            time.sleep(2)
+            fwd_cm(10)
+            time.sleep(0.2)
         elif area_current/area_original>1.1:
-            bwd_cm(5)
-            time.sleep(2)
+            bwd_cm(10)
+            time.sleep(0.2)
 
 
 

@@ -3,6 +3,7 @@ import picamera
 import numpy as np
 # from matplotlib import pyplot as plt
 from move import * 
+from picamera.array import PiRGBArray
 
 np.set_printoptions(suppress=True)
 
@@ -77,14 +78,14 @@ def get_threshold(hsv):
     # print "s ", s
     # print "v ", v
 
-    h_min = max(0, np.argmax(h) - 60)
-    h_max = min(179, np.argmax(h) + 60)
+    h_min = max(0, np.argmax(h) - 20)
+    h_max = min(179, np.argmax(h) + 20)
 
-    s_min = max(0, np.argmax(s) - 60)
-    s_max = min(255, np.argmax(s) + 60)
+    s_min = max(0, np.argmax(s) - 20)
+    s_max = min(255, np.argmax(s) + 20)
 
-    v_min = max(0, np.argmax(v) - 60)
-    v_max = min(255, np.argmax(v) + 60)
+    v_min = max(0, np.argmax(v) - 20)
+    v_max = min(255, np.argmax(v) + 20)
 
     print "h_min ", h_min
     print "h_max ", h_max
@@ -170,25 +171,36 @@ if __name__ == "__main__":
     # cv2.imshow("binary", binary_img)
 
     # cv2.waitKey()
+    lowResCap = PiRGBArray(camera, size=(320, 240))
+    lowResStream = camera.capture_continuous(lowResCap, format="bgr", splitter_port=2,
+                                             resize=(320, 240))
+    time.sleep(2.0)
 
-##    while True:
+    while True:
 ##        camera.capture(img_str)
-##        time.sleep(2)
+##        time.sleep(.5)
 ##
 ##        frame = cv2.imread(img_str)
-##
-##        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-##        hsv = cv2.GaussianBlur(hsv,(5,5),0)
-##
-##        binary_img = mask_hsv_img(hsv, 46, 106, 47, 107, 20, 80)
-##        print "before"
-##        cv2.imwrite("binary.jpg", binary_img)
-##        time.sleep(2)
-##        print "after"            
-##        
-##        cx, cy, area = get_centroid_area(binary_img)
-##
-##        move(cx, area)
+
+        lrs = lowResStream.next()
+        lrFrame = lrs.array
+        lowResCap.truncate(0)
+
+        print "lrFrame ", lrFrame
+
+        hsv = cv2.cvtColor(lrFrame, cv2.COLOR_BGR2HSV)
+        hsv = cv2.GaussianBlur(hsv,(5,5),0)
+
+        binary_img = mask_hsv_img(hsv, 108, 179, 83, 203, 105, 225)
+        print "before"
+        # cv2.imwrite("binary.jpg", binary_img)
+        time.sleep(.1)
+        print "after"            
+        
+        cx, cy, area = get_centroid_area(binary_img)
+
+        move(cx, area)
+        
 
 
 
