@@ -10,6 +10,7 @@ np.set_printoptions(suppress=True)
 
 list_of_clicks = []
 
+# code borrowed from class lecture slides
 def getXY(img):
     #define the event
     def getxy_callback(event, x, y, flags, param):
@@ -37,6 +38,7 @@ def getXY(img):
     return list_of_clicks
 
 
+# create an hsv image of the rectangle (target object)
 def get_rectangle_hsv(frame, list_of_clicks):
     rectangle = []
 
@@ -56,12 +58,15 @@ def get_rectangle_hsv(frame, list_of_clicks):
 
 def get_threshold(hsv):
 
+    # hue histogram
     h = cv2.calcHist([hsv],[0],None,[180],[0,180])
     h.astype(np.uint8)
 
+    # saturation histogram
     s = cv2.calcHist([hsv],[1],None,[256],[0,256])
     s.astype(np.uint8)
 
+    # value histogram
     v = cv2.calcHist([hsv],[2],None,[256],[0,256])
     v.astype(np.uint8)
 
@@ -78,6 +83,7 @@ def get_threshold(hsv):
     # print "s ", s
     # print "v ", v
 
+    # thresholds
     h_min = max(0, np.argmax(h) - 20)
     h_max = min(179, np.argmax(h) + 20)
 
@@ -99,13 +105,16 @@ def get_threshold(hsv):
 
 
 def mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max):
+    # create mask and apply
     mask = cv2.inRange(hsv, np.array([h_min, s_min, v_min], dtype = 'uint8'), np.array([h_max, s_max, v_max], dtype = 'uint8'))
     output = cv2.bitwise_and(hsv, hsv, mask = mask)
 
+    # convert to binary image
     im_hsv = cv2.cvtColor(output, cv2.COLOR_HSV2BGR)
     im_gray = cv2.cvtColor(im_hsv, cv2.COLOR_BGR2GRAY)
     (thresh, im_bw) = cv2.threshold(im_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
+    # apply erosion and dilation
     kernel = np.ones((3,3), np.uint8)
     img_erosion = cv2.erode(im_bw, kernel, iterations=1)
     img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
@@ -121,15 +130,18 @@ def get_centroid_area(binary_img):
     maxArea = 0
     M = 0
 
+    # no blobs, target object disappeared from the camera frame
     if len(contours) == 0:
         return -1, -1, -1
 
+    # find the moment and area of the target object
     for contour in contours:
         area = cv2.contourArea(contour)
         if area > maxArea:
             maxArea = area
             M = cv2.moments(contour)
 
+    # target object coordinates
     cx = M['m10'] / M['m00']
     cy = M['m01'] / M['m00']
 
@@ -143,6 +155,7 @@ def get_centroid_area(binary_img):
 if __name__ == "__main__":
     img_str = "img.jpg"
 
+    # initial image set up
     camera = picamera.PiCamera()
     camera.resolution = (320, 240)
     camera.capture(img_str)
@@ -150,17 +163,18 @@ if __name__ == "__main__":
 
 
     list_of_clicks = getXY(img_str)
-    frame = cv2.imread(img_str)
 
+    # image set up
+    frame = cv2.imread(img_str)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv,(5,5),0)
 
+    # get target object and threshold
     rectangle_hsv = get_rectangle_hsv(frame, list_of_clicks)
     h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(rectangle_hsv)
 
+    # get binary image
     binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
-    ini_cx, ini_cy, ini_area = get_centroid_area(binary_img)
-
 
 
     cv2.imshow("original ", frame)
@@ -169,6 +183,7 @@ if __name__ == "__main__":
     cv2.waitKey()
 
 
+    # start tracking
     while True:
         camera.capture(img_str)
         time.sleep(.8)
@@ -179,10 +194,9 @@ if __name__ == "__main__":
         hsv = cv2.GaussianBlur(hsv,(5,5),0)
 
         binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
-        print "before"
-        cv2.imwrite("binary.jpg", binary_img)
+        # cv2.imwrite("binary.jpg", binary_img)
         time.sleep(.1)
-        print "after"
+
 
         cx, cy, area = get_centroid_area(binary_img)
 
