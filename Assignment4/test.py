@@ -146,7 +146,7 @@ if __name__ == "__main__":
     camera = picamera.PiCamera()
     camera.resolution = (320, 240)
     camera.capture(img_str)
-    time.sleep(0.5)
+    time.sleep(3)
 
 
     list_of_clicks = getXY(img_str)
