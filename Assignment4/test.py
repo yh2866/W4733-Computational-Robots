@@ -1,9 +1,9 @@
 import cv2
 import picamera
 import numpy as np
-# from matplotlib import pyplot as plt
-from move import * 
-from picamera.array import PiRGBArray
+from matplotlib import pyplot as plt
+from move import *
+
 
 np.set_printoptions(suppress=True)
 
@@ -118,7 +118,6 @@ def get_centroid_area(binary_img):
 
     contours, hierarchy = cv2.findContours(img_cpy, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    # maxContourData = 0
     maxArea = 0
     M = 0
 
@@ -129,7 +128,6 @@ def get_centroid_area(binary_img):
         area = cv2.contourArea(contour)
         if area > maxArea:
             maxArea = area
-            # maxContourData = contour
             M = cv2.moments(contour)
 
     cx = M['m10'] / M['m00']
@@ -143,35 +141,32 @@ def get_centroid_area(binary_img):
 
 
 if __name__ == "__main__":
-    img_str = "img6.jpg"
-    
+    img_str = "img.jpg"
+
     camera = picamera.PiCamera()
     camera.resolution = (320, 240)
-##    camera.capture(img_str)
-##    time.sleep(0.5)
-##    
-##
-##    list_of_clicks = getXY(img_str)
-##    frame = cv2.imread(img_str)
-##
-##    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-##    hsv = cv2.GaussianBlur(hsv,(5,5),0)
+    camera.capture(img_str)
+    time.sleep(0.5)
 
-##    rectangle_hsv = get_rectangle_hsv(frame, list_of_clicks)
-##    h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(rectangle_hsv)
-##
-##    binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
-##    ini_cx, ini_cy, ini_area = get_centroid_area(binary_img)
 
-    
+    list_of_clicks = getXY(img_str)
+    frame = cv2.imread(img_str)
 
-    # print "coords ", ini_cx, " ", ini_cy
-    # print "area ", ini_area
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    hsv = cv2.GaussianBlur(hsv,(5,5),0)
 
-    # cv2.imshow("original ", frame)
-    # cv2.imshow("binary", binary_img)
+    rectangle_hsv = get_rectangle_hsv(frame, list_of_clicks)
+    h_min, h_max, s_min, s_max, v_min, v_max = get_threshold(rectangle_hsv)
 
-    # cv2.waitKey()
+    binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
+    ini_cx, ini_cy, ini_area = get_centroid_area(binary_img)
+
+
+
+    cv2.imshow("original ", frame)
+    cv2.imshow("binary", binary_img)
+
+    cv2.waitKey()
 
 
     while True:
@@ -183,25 +178,25 @@ if __name__ == "__main__":
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         hsv = cv2.GaussianBlur(hsv,(5,5),0)
 
-        binary_img = mask_hsv_img(hsv, 108, 179, 83, 203, 105, 225)
+        binary_img = mask_hsv_img(hsv, h_min, h_max, s_min, s_max, v_min, v_max)
         print "before"
         cv2.imwrite("binary.jpg", binary_img)
         time.sleep(.1)
-        print "after"            
-        
+        print "after"
+
         cx, cy, area = get_centroid_area(binary_img)
 
         if cx == -1:
             continue
         else:
             move(cx, area)
-        
 
 
 
 
 
 
-    
+
+
 
 
