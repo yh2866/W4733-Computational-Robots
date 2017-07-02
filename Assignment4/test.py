@@ -122,7 +122,8 @@ def get_centroid_area(binary_img):
     maxArea = 0
     M = 0
 
-    print "contours ", len(contours)
+    if len(contours) == 0:
+        return -1, -1, -1
 
     for contour in contours:
         area = cv2.contourArea(contour)
@@ -146,8 +147,8 @@ if __name__ == "__main__":
     
     camera = picamera.PiCamera()
     camera.resolution = (320, 240)
-    camera.capture(img_str)
-    time.sleep(0.5)
+##    camera.capture(img_str)
+##    time.sleep(0.5)
 ##    
 ##
 ##    list_of_clicks = getXY(img_str)
@@ -171,35 +172,29 @@ if __name__ == "__main__":
     # cv2.imshow("binary", binary_img)
 
     # cv2.waitKey()
-    lowResCap = PiRGBArray(camera, size=(320, 240))
-    lowResStream = camera.capture_continuous(lowResCap, format="bgr", splitter_port=2,
-                                             resize=(320, 240))
-    time.sleep(2.0)
+
 
     while True:
-##        camera.capture(img_str)
-##        time.sleep(.5)
-##
-##        frame = cv2.imread(img_str)
+        camera.capture(img_str)
+        time.sleep(.8)
 
-        lrs = lowResStream.next()
-        lrFrame = lrs.array
-        lowResCap.truncate(0)
+        frame = cv2.imread(img_str)
 
-        print "lrFrame ", lrFrame
-
-        hsv = cv2.cvtColor(lrFrame, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         hsv = cv2.GaussianBlur(hsv,(5,5),0)
 
         binary_img = mask_hsv_img(hsv, 108, 179, 83, 203, 105, 225)
         print "before"
-        # cv2.imwrite("binary.jpg", binary_img)
+        cv2.imwrite("binary.jpg", binary_img)
         time.sleep(.1)
         print "after"            
         
         cx, cy, area = get_centroid_area(binary_img)
 
-        move(cx, area)
+        if cx == -1:
+            continue
+        else:
+            move(cx, area)
         
 
 

@@ -87,10 +87,10 @@ def move(cx, area_current):
         original_flag = 0
     #Turn the flag to 0 when original is set
     if original_flag == 0:
-        if area_current/area_original<0.9:
+        if area_current/area_original<0.8:
             fwd_cm(10)
             time.sleep(0.2)
-        elif area_current/area_original>1.1:
+        elif area_current/area_original>1.2:
             bwd_cm(10)
             time.sleep(0.2)
 
